@@ -9,21 +9,21 @@ export const db = createClient({
 // Initialize database tables
 export async function init_database() {
 	await db.execute(`
-		CREATE TABLE IF NOT EXISTS transcripts (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			episode_title TEXT,
-			segment_text TEXT,
-			start_time REAL,
-			end_time REAL
-		)
-	`);
+    CREATE TABLE IF NOT EXISTS transcripts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      episode_title TEXT NOT NULL,
+      segment_text TEXT NOT NULL,
+      start_time REAL NOT NULL,
+      end_time REAL NOT NULL
+    )
+  `);
 
 	await db.execute(`
-		CREATE TABLE IF NOT EXISTS embeddings (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			transcript_id INTEGER,
-			embedding BLOB,
-			FOREIGN KEY(transcript_id) REFERENCES transcripts(id)
-		)
-	`);
+    CREATE TABLE IF NOT EXISTS embeddings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      transcript_id INTEGER NOT NULL,
+      embedding TEXT NOT NULL,
+      FOREIGN KEY(transcript_id) REFERENCES transcripts(id)
+    )
+  `);
 }

@@ -18,6 +18,20 @@ export async function transcribe_audio(audio_buffer: ArrayBuffer) {
 	}
 
 	const data = await response.json();
-	return data.results.channels[0].alternatives[0].paragraphs
-		.paragraphs;
+	const paragraphs =
+		data.results.channels[0].alternatives[0].paragraphs.paragraphs;
+
+	// Transform the paragraphs to include the text from sentences
+	return paragraphs.map((para: any) => {
+		// Combine all sentences in the paragraph into a single text
+		const combinedText = para.sentences
+			.map((sentence: any) => sentence.text)
+			.join(' ');
+
+		return {
+			text: combinedText,
+			start: para.start,
+			end: para.end,
+		};
+	});
 }

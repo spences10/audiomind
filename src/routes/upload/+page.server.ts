@@ -2,7 +2,7 @@ import { fail } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
 export const actions = {
-	upload: async ({ request }) => {
+	upload: async ({ request, fetch }) => {
 		try {
 			const data = await request.formData();
 			const audio = data.get('audio');
