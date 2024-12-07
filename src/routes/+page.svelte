@@ -1,148 +1,132 @@
 <script lang="ts">
-	let audio_file: File;
-	let episode_title = '';
-	let search_query = '';
-	let search_results: any[] = [];
-	let claude_response = '';
-	let processing = false;
-	let searching = false;
+	import type { ActionData } from './$types';
 
-	async function handle_upload() {
-		if (!audio_file || !episode_title) return;
-
-		processing = true;
-		const form_data = new FormData();
-		form_data.append('audio', audio_file);
-		form_data.append('title', episode_title);
-
-		try {
-			const response = await fetch('/api/process-episode', {
-				method: 'POST',
-				body: form_data,
-			});
-
-			if (!response.ok) throw new Error('Upload failed');
-
-			alert('Episode processed successfully!');
-		} catch (error) {
-			console.error('Upload error:', error);
-			alert('Failed to process episode');
-		} finally {
-			processing = false;
-		}
-	}
-
-	async function handle_search() {
-		if (!search_query) return;
-
-		searching = true;
-		try {
-			const response = await fetch('/api/search', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query: search_query }),
-			});
-
-			if (!response.ok) throw new Error('Search failed');
-
-			const data = await response.json();
-			search_results = data.results;
-			claude_response = data.claude_response;
-		} catch (error) {
-			console.error('Search error:', error);
-			alert('Search failed');
-		} finally {
-			searching = false;
-		}
-	}
-
-	function handle_file_change(event: Event) {
-		const target = event.target as HTMLInputElement;
-		if (target && target.files) {
-			audio_file = target.files[0];
-		}
-	}
+	const form = $props<{ form: ActionData }>();
+	let search_query = $state('');
 </script>
 
-<div class="container mx-auto p-4">
-	<h1 class="mb-4 text-2xl font-bold">Podcast Episode Processor</h1>
+<main class="min-h-screen bg-base-200 p-4">
+	<div class="container mx-auto max-w-4xl">
+		<header>
+			<h1 class="mb-8 text-center text-4xl font-bold text-primary">
+				Grumpy SEO Guy Podcast Chat
+			</h1>
+		</header>
 
-	<div class="mb-8 rounded border p-4">
-		<h2 class="mb-4 text-xl">Upload Episode</h2>
-		<div class="space-y-4">
-			<div>
-				<label class="mb-2 block">Episode Title</label>
-				<input
-					type="text"
-					bind:value={episode_title}
-					class="w-full rounded border p-2"
-					placeholder="Enter episode title"
-				/>
-			</div>
-
-			<div>
-				<label class="mb-2 block">Audio File</label>
-				<input
-					type="file"
-					accept="audio/*"
-					on:change={handle_file_change}
-					class="w-full"
-				/>
-			</div>
-
-			<button
-				on:click={handle_upload}
-				disabled={processing}
-				class="rounded bg-blue-500 px-4 py-2 text-white disabled:opacity-50"
-			>
-				{processing ? 'Processing...' : 'Process Episode'}
-			</button>
-		</div>
-	</div>
-
-	<div class="rounded border p-4">
-		<h2 class="mb-4 text-xl">Search Episodes</h2>
-		<div class="space-y-4">
-			<div>
-				<input
-					type="text"
-					bind:value={search_query}
-					class="w-full rounded border p-2"
-					placeholder="Enter search query"
-				/>
-			</div>
-
-			<button
-				on:click={handle_search}
-				disabled={searching}
-				class="rounded bg-green-500 px-4 py-2 text-white disabled:opacity-50"
-			>
-				{searching ? 'Searching...' : 'Search'}
-			</button>
-
-			{#if search_results.length > 0}
-				<div class="mt-4 space-y-4">
-					{#if claude_response}
-						<div
-							class="mb-6 rounded border border-blue-200 bg-blue-50 p-4"
+		<section
+			class="card bg-base-100 shadow-xl"
+			aria-labelledby="search-title"
+		>
+			<div class="card-body">
+				<h2 id="search-title" class="card-title text-secondary">
+					Search Episodes
+				</h2>
+				<form class="space-y-4" method="POST" action="?/search">
+					<div class="join w-full">
+						<label for="search-query" class="sr-only"
+							>Search query</label
 						>
-							<h3 class="mb-2 font-bold">Claude's Response:</h3>
-							<div class="prose">{claude_response}</div>
+						<input
+							type="search"
+							id="search-query"
+							name="query"
+							bind:value={search_query}
+							class="input join-item input-bordered input-primary flex-1"
+							placeholder="Enter search query"
+						/>
+						<button type="submit" class="btn btn-primary join-item">
+							Search
+						</button>
+					</div>
+
+					{#if form.form?.error}
+						<div class="alert alert-error shadow-lg" role="alert">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+								/></svg
+							>
+							<span>{form.form.error}</span>
 						</div>
 					{/if}
 
-					<h3 class="mb-2 font-bold">Related Segments:</h3>
-					{#each search_results as result}
-						<div class="rounded border p-4">
-							<div class="font-bold">{result.episode}</div>
-							<div class="text-sm text-gray-600">
-								Similarity: {(result.similarity * 100).toFixed(1)}%
+					{#if form.form?.success}
+						<div class="space-y-4">
+							{#if form.form.claude_response}
+								<article
+									class="alert alert-info shadow-lg"
+									role="alert"
+								>
+									<div>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											fill="none"
+											viewBox="0 0 24 24"
+											class="h-6 w-6 flex-shrink-0 stroke-current"
+											aria-hidden="true"
+											><path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+											></path></svg
+										>
+										<div>
+											<h3 class="font-bold text-primary">
+												Claude's Response:
+											</h3>
+											<div class="prose max-w-none">
+												{form.form.claude_response}
+											</div>
+										</div>
+									</div>
+								</article>
+							{/if}
+
+							<div
+								class="divider font-medium text-primary"
+								role="separator"
+							>
+								Search Results
 							</div>
-							<div class="mt-2">{result.text}</div>
+
+							<div
+								class="space-y-4"
+								role="feed"
+								aria-label="Search results"
+							>
+								{#each form.form.results as result}
+									<article
+										class="card bg-base-200 shadow-sm transition-shadow hover:shadow-md"
+									>
+										<div class="card-body">
+											<h4 class="card-title text-base text-primary">
+												{result.episode}
+											</h4>
+											<div
+												class="badge badge-secondary text-base-100"
+											>
+												Similarity: {(
+													result.similarity * 100
+												).toFixed(1)}%
+											</div>
+											<p class="mt-2">{result.text}</p>
+										</div>
+									</article>
+								{/each}
+							</div>
 						</div>
-					{/each}
-				</div>
-			{/if}
-		</div>
+					{/if}
+				</form>
+			</div>
+		</section>
 	</div>
-</div>
+</main>
