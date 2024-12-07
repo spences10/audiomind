@@ -11,8 +11,6 @@ interface Segment {
 }
 
 export async function POST({ request }) {
-	let transactionStarted = false;
-
 	try {
 		const formData = await request.formData();
 		const audio = formData.get('audio');
@@ -44,63 +42,56 @@ export async function POST({ request }) {
 			`Processing ${segments.length} segments for episode: ${title}`,
 		);
 
-		// Begin transaction
-		await db.execute('BEGIN TRANSACTION');
-		transactionStarted = true;
-
+		// Process each segment atomically
 		for (const segment of segments) {
-			// Validate segment data before insertion
-			if (!segment.text || typeof segment.text !== 'string') {
-				console.warn('Skipping segment with invalid text:', segment);
+			try {
+				// Validate segment data before insertion
+				if (!segment.text || typeof segment.text !== 'string') {
+					console.warn(
+						'Skipping segment with invalid text:',
+						segment,
+					);
+					continue;
+				}
+
+				// Ensure numeric types for start/end times
+				const start = parseFloat(String(segment.start)) || 0;
+				const end = parseFloat(String(segment.end)) || 0;
+
+				// Insert transcript and get the ID using a single atomic operation
+				const insertResult = (await db.execute({
+					sql: `INSERT INTO transcripts (episode_title, segment_text, start_time, end_time) 
+						VALUES (?, ?, ?, ?) RETURNING id`,
+					args: [title, segment.text, start, end],
+				})) as ResultSet;
+
+				const transcriptId = insertResult.rows[0]?.id;
+
+				if (typeof transcriptId !== 'number') {
+					throw new Error(
+						`Failed to get transcript ID after insertion. Result: ${JSON.stringify(insertResult)}`,
+					);
+				}
+
+				// Get embedding for the segment
+				const embedding = await generate_embedding(segment.text);
+
+				// Insert embedding with the correct transcript_id in a single atomic operation
+				await db.execute({
+					sql: `INSERT INTO embeddings (transcript_id, embedding) VALUES (?, ?)`,
+					args: [transcriptId, embedding],
+				});
+			} catch (segmentError) {
+				console.error('Error processing segment:', segmentError);
+				// Continue with next segment instead of failing the entire batch
 				continue;
 			}
-
-			// Ensure numeric types for start/end times
-			const start = parseFloat(String(segment.start)) || 0;
-			const end = parseFloat(String(segment.end)) || 0;
-
-			// Insert transcript and get the ID
-			const insertResult = (await db.execute({
-				sql: `INSERT INTO transcripts (episode_title, segment_text, start_time, end_time) 
-					VALUES (?, ?, ?, ?) RETURNING id`,
-				args: [title, segment.text, start, end],
-			})) as ResultSet;
-
-			const transcriptId = insertResult.rows[0]?.id;
-
-			if (typeof transcriptId !== 'number') {
-				throw new Error(
-					`Failed to get transcript ID after insertion. Result: ${JSON.stringify(insertResult)}`,
-				);
-			}
-
-			// Get embedding for the segment
-			const embedding = await generate_embedding(segment.text);
-
-			// Insert embedding with the correct transcript_id
-			await db.execute({
-				sql: `INSERT INTO embeddings (transcript_id, embedding) VALUES (?, ?)`,
-				args: [transcriptId, embedding],
-			});
 		}
-
-		// Commit transaction if everything succeeded
-		await db.execute('COMMIT');
-		transactionStarted = false;
 
 		return new Response(JSON.stringify({ success: true }), {
 			headers: { 'Content-Type': 'application/json' },
 		});
 	} catch (err: unknown) {
-		// Only attempt rollback if we know a transaction was started
-		if (transactionStarted) {
-			try {
-				await db.execute('ROLLBACK');
-			} catch (rollbackErr) {
-				console.error('Error during rollback:', rollbackErr);
-			}
-		}
-
 		console.error('Process episode error:', err);
 
 		// Handle specific error types
