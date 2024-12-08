@@ -76,10 +76,14 @@ export async function POST({ request }) {
 				// Get embedding for the segment
 				const embedding = await generate_embedding(segment.text);
 
+				// Ensure the embedding is properly formatted as a JSON string
+				// The embedding is an array of numbers, so we need to wrap it in an object
+				const embedding_json = JSON.stringify({ vector: embedding });
+
 				// Insert embedding with the correct transcript_id in a single atomic operation
 				await db.execute({
 					sql: `INSERT INTO embeddings (transcript_id, embedding) VALUES (?, ?)`,
-					args: [transcriptId, embedding],
+					args: [transcriptId, embedding_json],
 				});
 			} catch (segmentError) {
 				console.error('Error processing segment:', segmentError);

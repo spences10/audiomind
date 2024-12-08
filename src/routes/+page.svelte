@@ -1,8 +1,67 @@
 <script lang="ts">
-	import type { ActionData } from './$types';
+	import { chat } from '$lib/stores/chat.svelte';
+	import { marked } from 'marked';
 
-	const form = $props<{ form: ActionData }>();
 	let search_query = $state('');
+
+	const handle_submit = async (event: SubmitEvent) => {
+		event.preventDefault();
+		if (!search_query.trim()) return;
+
+		chat.set_loading(true);
+		chat.add_message('user', search_query);
+
+		try {
+			const response = await fetch('/api/search', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ query: search_query }),
+			});
+
+			if (!response.ok) throw new Error('Search failed');
+
+			const reader = response.body?.getReader();
+			if (!reader) throw new Error('No reader available');
+
+			const decoder = new TextDecoder();
+			let buffer = '';
+
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+
+				buffer += decoder.decode(value, { stream: true });
+				const lines = buffer.split('\n');
+				buffer = lines.pop() || '';
+
+				for (const line of lines) {
+					if (!line.trim()) continue;
+
+					try {
+						const data = JSON.parse(line);
+						if (data.type === 'results') {
+							chat.set_search_results(data.data);
+						} else if (data.type === 'claude_response') {
+							chat.append_to_current_response(data.data);
+						}
+					} catch (e) {
+						console.error('Failed to parse line:', line, e);
+					}
+				}
+			}
+
+			chat.finalize_response();
+			search_query = '';
+		} catch (error) {
+			console.error('Search error:', error);
+			chat.add_message(
+				'assistant',
+				'Sorry, something went wrong. Please try again.',
+			);
+		} finally {
+			chat.set_loading(false);
+		}
+	};
 </script>
 
 <main class="min-h-screen bg-base-200 p-4">
@@ -13,119 +72,103 @@
 			</h1>
 		</header>
 
-		<section
-			class="card bg-base-100 shadow-xl"
-			aria-labelledby="search-title"
-		>
+		<section class="card bg-base-100 shadow-xl">
 			<div class="card-body">
-				<h2 id="search-title" class="card-title text-secondary">
-					Search Episodes
-				</h2>
-				<form class="space-y-4" method="POST" action="?/search">
-					<div class="join w-full">
-						<label for="search-query" class="sr-only"
-							>Search query</label
+				<div class="mb-4 space-y-4">
+					{#each chat.messages as message}
+						<div
+							class="chat {message.role === 'user'
+								? 'chat-end'
+								: 'chat-start'}"
 						>
-						<input
-							type="search"
-							id="search-query"
-							name="query"
-							bind:value={search_query}
-							class="input join-item input-bordered input-primary flex-1"
-							placeholder="Enter search query"
-						/>
-						<button type="submit" class="btn btn-primary join-item">
-							Search
-						</button>
-					</div>
-
-					{#if form.form?.error}
-						<div class="alert alert-error shadow-lg" role="alert">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-6 w-6"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								><path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-								/></svg
+							<div class="chat-header mb-1 opacity-75">
+								{message.role === 'user' ? 'You' : 'Grumpy SEO Guy'}
+							</div>
+							<div
+								class="chat-bubble {message.role === 'user'
+									? 'chat-bubble-primary'
+									: 'chat-bubble-accent'}"
 							>
-							<span>{form.form.error}</span>
+								{#if message.role === 'assistant'}
+									{@html marked(message.content)}
+								{:else}
+									{message.content}
+								{/if}
+							</div>
+						</div>
+					{/each}
+
+					{#if chat.current_response}
+						<div class="chat chat-start">
+							<div class="chat-header mb-1 opacity-75">
+								Grumpy SEO Guy
+							</div>
+							<div class="chat-bubble chat-bubble-accent">
+								{@html marked(chat.current_response)}
+							</div>
 						</div>
 					{/if}
 
-					{#if form.form?.success}
-						<div class="space-y-4">
-							{#if form.form.claude_response}
-								<article
-									class="alert alert-info shadow-lg"
-									role="alert"
-								>
-									<div>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											fill="none"
-											viewBox="0 0 24 24"
-											class="h-6 w-6 flex-shrink-0 stroke-current"
-											aria-hidden="true"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-											></path></svg
-										>
-										<div>
-											<h3 class="font-bold text-primary">
-												Claude's Response:
+					{#if chat.is_loading && !chat.current_response}
+						<div class="chat chat-start">
+							<div class="chat-header mb-1 opacity-75">
+								Grumpy SEO Guy
+							</div>
+							<div class="chat-bubble chat-bubble-accent">
+								<span class="loading loading-dots loading-md"></span>
+							</div>
+						</div>
+					{/if}
+				</div>
+
+				<form class="mt-4" onsubmit={handle_submit}>
+					<div class="join w-full">
+						<input
+							type="search"
+							bind:value={search_query}
+							class="input join-item input-bordered input-primary flex-1"
+							placeholder="Ask about SEO..."
+							disabled={chat.is_loading}
+						/>
+						<button
+							type="submit"
+							class="btn btn-primary join-item"
+							disabled={chat.is_loading || !search_query.trim()}
+						>
+							{#if chat.is_loading}
+								<span class="loading loading-spinner"></span>
+							{:else}
+								Ask
+							{/if}
+						</button>
+					</div>
+				</form>
+
+				{#if chat.search_results.length > 0}
+					<div class="collapse collapse-arrow mt-4">
+						<input type="checkbox" />
+						<div class="collapse-title text-xl font-medium">
+							Search Results
+						</div>
+						<div class="collapse-content">
+							<div class="space-y-4">
+								{#each chat.search_results as result}
+									<div class="card bg-base-200 shadow-sm">
+										<div class="card-body py-4">
+											<h3 class="card-title text-sm text-primary">
+												{result.episode}
 											</h3>
-											<div class="prose max-w-none">
-												{form.form.claude_response}
+											<div class="badge badge-accent badge-sm">
+												{result.similarity}% match
 											</div>
+											<p class="mt-2 text-sm">{result.text}</p>
 										</div>
 									</div>
-								</article>
-							{/if}
-
-							<div
-								class="divider font-medium text-primary"
-								role="separator"
-							>
-								Search Results
-							</div>
-
-							<div
-								class="space-y-4"
-								role="feed"
-								aria-label="Search results"
-							>
-								{#each form.form.results as result}
-									<article
-										class="card bg-base-200 shadow-sm transition-shadow hover:shadow-md"
-									>
-										<div class="card-body">
-											<h4 class="card-title text-base text-primary">
-												{result.episode}
-											</h4>
-											<div
-												class="badge badge-secondary text-base-100"
-											>
-												Similarity: {(
-													result.similarity * 100
-												).toFixed(1)}%
-											</div>
-											<p class="mt-2">{result.text}</p>
-										</div>
-									</article>
 								{/each}
 							</div>
 						</div>
-					{/if}
-				</form>
+					</div>
+				{/if}
 			</div>
 		</section>
 	</div>
