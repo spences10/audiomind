@@ -2,7 +2,8 @@ import { db } from '$lib/server/database';
 import { transcribe_audio } from '$lib/server/deepgram';
 import { generate_embedding } from '$lib/server/voyage';
 import type { ResultSet } from '@libsql/client';
-import { error } from '@sveltejs/kit';
+import { error, type RequestHandler } from '@sveltejs/kit';
+import { upload_progress } from '$lib/stores/upload-progress.svelte';
 
 interface Segment {
 	text: string;
@@ -10,107 +11,129 @@ interface Segment {
 	end: number;
 }
 
-export async function POST({ request }) {
+export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const formData = await request.formData();
 		const audio = formData.get('audio');
 		const title = formData.get('title');
 
 		if (!audio || !(audio instanceof File)) {
+			upload_progress.handle_update({
+				stage: 'error',
+				message: 'Missing or invalid audio file',
+				progress: 0
+			});
 			throw error(400, 'Missing or invalid audio file');
 		}
 
 		if (!title || typeof title !== 'string') {
+			upload_progress.handle_update({
+				stage: 'error',
+				message: 'Missing or invalid episode title',
+				progress: 0
+			});
 			throw error(400, 'Missing or invalid episode title');
 		}
 
 		const buffer = await audio.arrayBuffer();
+		
+		// Start transcription
+		upload_progress.handle_update({
+			stage: 'transcribing',
+			message: `Starting transcription for: ${title}`,
+			progress: 0
+		});
+
 		const segments = (await transcribe_audio(buffer)) as Segment[];
 
-		if (
-			!segments ||
-			!Array.isArray(segments) ||
-			segments.length === 0
-		) {
-			throw error(
-				400,
-				'Failed to transcribe audio or no segments produced',
-			);
+		if (!segments || !Array.isArray(segments) || segments.length === 0) {
+			upload_progress.handle_update({
+				stage: 'error',
+				message: 'Failed to transcribe audio or no segments produced',
+				progress: 0
+			});
+			throw error(400, 'Failed to transcribe audio or no segments produced');
 		}
 
-		console.log(
-			`Processing ${segments.length} segments for episode: ${title}`,
-		);
+		const total_segments = segments.length;
+		let processed_count = 0;
 
-		// Process each segment atomically
+		upload_progress.handle_update({
+			stage: 'processing_segments',
+			message: `Processing ${segments.length} segments for episode: ${title}`,
+			current: processed_count,
+			total: total_segments,
+			progress: 0
+		});
+
 		for (const segment of segments) {
-			try {
-				// Validate segment data before insertion
-				if (!segment.text || typeof segment.text !== 'string') {
-					console.warn(
-						'Skipping segment with invalid text:',
-						segment,
-					);
-					continue;
-				}
-
-				// Ensure numeric types for start/end times
-				const start = parseFloat(String(segment.start)) || 0;
-				const end = parseFloat(String(segment.end)) || 0;
-
-				// Insert transcript and get the ID using a single atomic operation
-				const insertResult = (await db.execute({
-					sql: `INSERT INTO transcripts (episode_title, segment_text, start_time, end_time) 
-						VALUES (?, ?, ?, ?) RETURNING id`,
-					args: [title, segment.text, start, end],
-				})) as ResultSet;
-
-				const transcriptId = insertResult.rows[0]?.id;
-
-				if (typeof transcriptId !== 'number') {
-					throw new Error(
-						`Failed to get transcript ID after insertion. Result: ${JSON.stringify(insertResult)}`,
-					);
-				}
-
-				// Get embedding for the segment
-				const embedding = await generate_embedding(segment.text);
-
-				// Ensure the embedding is properly formatted as a JSON string
-				// The embedding is an array of numbers, so we need to wrap it in an object
-				const embedding_json = JSON.stringify({ vector: embedding });
-
-				// Insert embedding with the correct transcript_id in a single atomic operation
-				await db.execute({
-					sql: `INSERT INTO embeddings (transcript_id, embedding) VALUES (?, ?)`,
-					args: [transcriptId, embedding_json],
-				});
-			} catch (segmentError) {
-				console.error('Error processing segment:', segmentError);
-				// Continue with next segment instead of failing the entire batch
+			if (!segment.text || typeof segment.text !== 'string') {
+				console.warn('Skipping segment with invalid text:', segment);
 				continue;
 			}
+
+			const start = parseFloat(String(segment.start)) || 0;
+			const end = parseFloat(String(segment.end)) || 0;
+
+			const insertResult = (await db.execute({
+				sql: `INSERT INTO transcripts (episode_title, segment_text, start_time, end_time) 
+					VALUES (?, ?, ?, ?) RETURNING id`,
+				args: [title, segment.text, start, end],
+			})) as ResultSet;
+
+			const transcriptId = insertResult.rows[0]?.id;
+			if (typeof transcriptId !== 'number') {
+				throw new Error('Failed to get transcript ID after insertion');
+			}
+
+			const embedding = await generate_embedding(segment.text);
+			const embedding_json = JSON.stringify({ vector: embedding });
+			await db.execute({
+				sql: `INSERT INTO embeddings (transcript_id, embedding) VALUES (?, ?)`,
+				args: [transcriptId, embedding_json],
+			});
+
+			processed_count++;
+			
+			// Update progress
+			upload_progress.handle_update({
+				stage: 'processing_segments',
+				message: `Processing segment ${processed_count}/${total_segments}`,
+				current: processed_count,
+				total: total_segments,
+				progress: (processed_count / total_segments) * 100
+			});
+
+			// Add a small delay to allow UI updates
+			await new Promise(resolve => setTimeout(resolve, 100));
 		}
 
-		return new Response(JSON.stringify({ success: true }), {
-			headers: { 'Content-Type': 'application/json' },
+		upload_progress.handle_update({
+			stage: 'completed',
+			message: `Successfully processed ${processed_count} out of ${total_segments} segments`,
+			current: processed_count,
+			total: total_segments,
+			progress: 100
 		});
-	} catch (err: unknown) {
+
+		return new Response(JSON.stringify({ 
+			success: true,
+			processed_segments: processed_count,
+			total_segments
+		}), {
+			headers: { 'Content-Type': 'application/json' }
+		});
+
+	} catch (err) {
 		console.error('Process episode error:', err);
+		const error_message = err instanceof Error ? err.message : 'Unknown error';
+		
+		upload_progress.handle_update({
+			stage: 'error',
+			message: error_message,
+			progress: 0
+		});
 
-		// Handle specific error types
-		if (
-			err instanceof Error &&
-			'status' in err &&
-			err.status === 400
-		) {
-			throw err; // Re-throw validation errors
-		}
-
-		const errorMessage =
-			err instanceof Error ? err.message : 'Unknown error';
-		console.error('Detailed error:', errorMessage);
-
-		throw error(500, 'Failed to process episode: ' + errorMessage);
+		throw error(500, error_message);
 	}
-}
+}; 

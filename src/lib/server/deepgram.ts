@@ -1,37 +1,45 @@
 import { DEEPGRAM_API_KEY } from '$env/static/private';
+import { createClient } from '@deepgram/sdk';
 
 export async function transcribe_audio(audio_buffer: ArrayBuffer) {
-	const response = await fetch(
-		'https://api.deepgram.com/v1/listen?model=nova&smart_format=true&paragraphs=true&punctuate=true',
-		{
-			method: 'POST',
-			headers: {
-				Authorization: `Token ${DEEPGRAM_API_KEY}`,
-				'Content-Type': 'audio/wav',
-			},
-			body: audio_buffer,
-		},
-	);
+	try {
+		const deepgram = createClient(DEEPGRAM_API_KEY);
 
-	if (!response.ok) {
-		throw new Error(`Deepgram API error: ${response.statusText}`);
+		const { result, error } =
+			await deepgram.listen.prerecorded.transcribeFile(audio_buffer, {
+				model: 'nova-2',
+				smart_format: true,
+				utterances: true,
+			});
+
+		if (error) {
+			throw new Error(
+				`Deepgram transcription error: ${error.message}`,
+			);
+		}
+
+		const paragraphs =
+			result.results.channels[0].alternatives[0].paragraphs
+				.paragraphs;
+
+		// Transform the paragraphs to include the text from sentences
+		return paragraphs.map((para: any) => {
+			// Combine all sentences in the paragraph into a single text
+			const combinedText = para.sentences
+				.map((sentence: any) => sentence.text)
+				.join(' ');
+
+			return {
+				text: combinedText,
+				start: para.start,
+				end: para.end,
+			};
+		});
+	} catch (error) {
+		console.error('Transcription error:', error);
+		if (error instanceof Error) {
+			throw new Error(`Transcription failed: ${error.message}`);
+		}
+		throw error;
 	}
-
-	const data = await response.json();
-	const paragraphs =
-		data.results.channels[0].alternatives[0].paragraphs.paragraphs;
-
-	// Transform the paragraphs to include the text from sentences
-	return paragraphs.map((para: any) => {
-		// Combine all sentences in the paragraph into a single text
-		const combinedText = para.sentences
-			.map((sentence: any) => sentence.text)
-			.join(' ');
-
-		return {
-			text: combinedText,
-			start: para.start,
-			end: para.end,
-		};
-	});
 }
