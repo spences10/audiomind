@@ -38,32 +38,45 @@
 				event_source = null;
 			}
 
-			// Create new connection
-			event_source = new EventSource(
-				`/api/search/stream?query=${encodeURIComponent(search_query)}&response_style=${chat.response_style}`,
-			);
+			const response = await fetch('/api/search', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					query: search_query,
+					response_style: chat.response_style,
+				}),
+			});
 
-			event_source.onmessage = (e) => {
-				try {
-					const data = JSON.parse(e.data);
-					if (data.type === 'results') {
-						chat.set_search_results(data.data);
-					} else if (data.type === 'claude_response') {
-						chat.append_to_current_response(data.data);
+			if (!response.ok) {
+				throw new Error('Search request failed');
+			}
+
+			const reader = response.body?.getReader();
+			if (!reader) throw new Error('No reader available');
+
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+
+				const chunk = new TextDecoder().decode(value);
+				const lines = chunk.split('\n');
+
+				for (const line of lines) {
+					if (!line.trim()) continue;
+					try {
+						const data = JSON.parse(line);
+						if (data.type === 'results') {
+							chat.set_search_results(data.data);
+						} else if (data.type === 'claude_response') {
+							chat.append_to_current_response(data.data);
+						}
+					} catch (err) {
+						console.error('Failed to parse event data:', err);
 					}
-				} catch (err) {
-					console.error('Failed to parse event data:', err);
 				}
-			};
-
-			event_source.onerror = () => {
-				if (event_source) {
-					event_source.close();
-					event_source = null;
-				}
-				chat.finalize_response();
-				chat.set_loading(false);
-			};
+			}
 
 			search_query = '';
 		} catch (error) {
@@ -72,6 +85,8 @@
 				'assistant',
 				'Sorry, something went wrong. Please try again.',
 			);
+		} finally {
+			chat.finalize_response();
 			chat.set_loading(false);
 		}
 	};
@@ -97,17 +112,19 @@
 							<div class="chat-header mb-1 opacity-75">
 								{message.role === 'user' ? 'You' : 'Grumpy SEO Guy'}
 							</div>
-							<div
-								class="chat-bubble {message.role === 'user'
-									? 'chat-bubble-primary'
-									: 'chat-bubble-accent'}"
-							>
-								{#if message.role === 'assistant'}
-									{@html marked(message.content)}
-								{:else}
+							{#if message.role === 'assistant'}
+								<div class="chat-bubble chat-bubble-accent">
+									<div
+										class="prose prose-headings:mb-2 prose-headings:mt-0 prose-p:my-1 prose-code:rounded prose-code:bg-primary/10 prose-code:px-1 prose-code:py-0.5 prose-code:text-primary prose-code:before:content-none prose-code:after:content-none prose-pre:my-1 prose-pre:bg-base-300 prose-pre:p-2 prose-ul:my-1 prose-li:my-0"
+									>
+										{@html marked(message.content)}
+									</div>
+								</div>
+							{:else}
+								<div class="chat-bubble chat-bubble-primary">
 									{message.content}
-								{/if}
-							</div>
+								</div>
+							{/if}
 						</div>
 					{/each}
 
@@ -117,7 +134,11 @@
 								Grumpy SEO Guy
 							</div>
 							<div class="chat-bubble chat-bubble-accent">
-								{@html marked(chat.current_response)}
+								<div
+									class="prose prose-headings:mb-2 prose-headings:mt-0 prose-p:my-1 prose-code:rounded prose-code:bg-primary/10 prose-code:px-1 prose-code:py-0.5 prose-code:text-primary prose-code:before:content-none prose-code:after:content-none prose-pre:my-1 prose-pre:bg-base-300 prose-pre:p-2 prose-ul:my-1 prose-li:my-0"
+								>
+									{@html marked(chat.current_response)}
+								</div>
 							</div>
 						</div>
 					{/if}
@@ -192,7 +213,7 @@
 												{result.episode}
 											</h3>
 											<div class="badge badge-accent badge-sm">
-												{result.similarity}% match
+												{result.similarity.toFixed(1)}% match
 											</div>
 											<p class="mt-2 text-sm">{result.text}</p>
 										</div>
