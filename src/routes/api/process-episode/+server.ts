@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const title = formData.get('title');
 
 		if (!audio || !(audio instanceof File)) {
-			upload_progress.handle_update({
+			upload_progress.update_progress({
 				stage: 'error',
 				message: 'Missing or invalid audio file',
 				progress: 0
@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		if (!title || typeof title !== 'string') {
-			upload_progress.handle_update({
+			upload_progress.update_progress({
 				stage: 'error',
 				message: 'Missing or invalid episode title',
 				progress: 0
@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const buffer = await audio.arrayBuffer();
 		
 		// Start transcription
-		upload_progress.handle_update({
+		upload_progress.update_progress({
 			stage: 'transcribing',
 			message: `Starting transcription for: ${title}`,
 			progress: 0
@@ -47,7 +47,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const segments = (await transcribe_audio(buffer)) as Segment[];
 
 		if (!segments || !Array.isArray(segments) || segments.length === 0) {
-			upload_progress.handle_update({
+			upload_progress.update_progress({
 				stage: 'error',
 				message: 'Failed to transcribe audio or no segments produced',
 				progress: 0
@@ -58,11 +58,11 @@ export const POST: RequestHandler = async ({ request }) => {
 		const total_segments = segments.length;
 		let processed_count = 0;
 
-		upload_progress.handle_update({
+		upload_progress.update_progress({
 			stage: 'processing_segments',
 			message: `Processing ${segments.length} segments for episode: ${title}`,
 			current: processed_count,
-			total: total_segments,
+				total: total_segments,
 			progress: 0
 		});
 
@@ -96,7 +96,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			processed_count++;
 			
 			// Update progress
-			upload_progress.handle_update({
+			upload_progress.update_progress({
 				stage: 'processing_segments',
 				message: `Processing segment ${processed_count}/${total_segments}`,
 				current: processed_count,
@@ -108,7 +108,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			await new Promise(resolve => setTimeout(resolve, 100));
 		}
 
-		upload_progress.handle_update({
+		upload_progress.update_progress({
 			stage: 'completed',
 			message: `Successfully processed ${processed_count} out of ${total_segments} segments`,
 			current: processed_count,
@@ -128,7 +128,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		console.error('Process episode error:', err);
 		const error_message = err instanceof Error ? err.message : 'Unknown error';
 		
-		upload_progress.handle_update({
+		upload_progress.update_progress({
 			stage: 'error',
 			message: error_message,
 			progress: 0
