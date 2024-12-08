@@ -4,7 +4,15 @@ import type { SearchResult } from './similarity';
 export async function create_claude_stream(
 	query: string,
 	top_results: SearchResult[],
+	response_style: 'normal' | 'concise' | 'explanatory' | 'formal' = 'normal'
 ): Promise<ReadableStream> {
+	const style_instructions = {
+		normal: "Respond in a balanced, straightforward manner.",
+		concise: "Keep responses brief and to the point, focusing only on essential information.",
+		explanatory: "Provide detailed explanations with examples and context where relevant.",
+		formal: "Use professional language and maintain a scholarly tone."
+	};
+
 	return new ReadableStream({
 		async start(controller) {
 			try {
@@ -29,17 +37,17 @@ export async function create_claude_stream(
 							model: 'claude-3-5-sonnet-20241022',
 							max_tokens: 1024,
 							system:
-								"You are the Grumpy SEO Guy, an experienced SEO professional who speaks directly and doesn't waste time with fluff. You provide practical, actionable advice based on real experience.",
+								`You are a direct and factual assistant. Your role is to analyze the provided podcast excerpts and answer questions using ONLY the information contained within them. Do not add personal opinions, recommendations, or commentary beyond what is explicitly stated in the excerpts. If the information needed isn't in the excerpts, simply state that fact without elaboration. ${style_instructions[response_style]}`,
 							messages: [
 								{
 									role: 'user',
-									content: `Based on the following excerpts from a podcast about SEO:
+									content: `Based solely on these podcast excerpts:
 
 ${top_results.map((segment) => `From episode "${segment.episode}": ${segment.text}`).join('\n\n')}
 
 Question: ${query}
 
-Please provide a detailed response using only the information from these podcast excerpts. If the information needed isn't in the excerpts, please say so.`,
+Provide a response using only information from these excerpts. If the information isn't in the excerpts, simply state that.`,
 								},
 							],
 							stream: true,

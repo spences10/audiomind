@@ -1,10 +1,11 @@
 import type { RequestHandler } from './$types';
 import { search_similar_segments } from './similarity';
 import { create_claude_stream } from './claude-stream';
+import type { ResponseStyle } from '$lib/stores/chat.svelte';
 
 export const POST: RequestHandler = async ({ request }) => {
     try {
-        const { query } = await request.json();
+        const { query, response_style } = await request.json();
 
         const top_results = await search_similar_segments(query);
 
@@ -21,7 +22,7 @@ export const POST: RequestHandler = async ({ request }) => {
             );
         }
 
-        const stream = await create_claude_stream(query, top_results);
+        const stream = await create_claude_stream(query, top_results, response_style as ResponseStyle);
 
         return new Response(stream, {
             headers: {

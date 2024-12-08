@@ -5,14 +5,21 @@ type SearchResult = {
 	similarity: number;
 };
 
+export type ResponseStyle = 'normal' | 'concise' | 'explanatory' | 'formal';
+
 export class ChatStore {
 	messages = $state<Message[]>([]);
 	current_response = $state('');
 	is_loading = $state(false);
 	search_results = $state<SearchResult[]>([]);
+	response_style = $state<ResponseStyle>('normal');
 
 	set_loading(value: boolean) {
 		this.is_loading = value;
+	}
+
+	set_response_style(style: ResponseStyle) {
+		this.response_style = style;
 	}
 
 	add_message(role: 'user' | 'assistant', content: string) {

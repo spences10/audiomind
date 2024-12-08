@@ -1,8 +1,16 @@
 <script lang="ts">
 	import { chat } from '$lib/stores/chat.svelte';
+	import type { ResponseStyle } from '$lib/stores/chat.svelte';
 	import { marked } from 'marked';
 
 	let search_query = $state('');
+
+	const response_styles: { value: ResponseStyle; label: string }[] = [
+		{ value: 'normal', label: 'Normal' },
+		{ value: 'concise', label: 'Concise' },
+		{ value: 'explanatory', label: 'Explanatory' },
+		{ value: 'formal', label: 'Formal' }
+	];
 
 	const handle_submit = async (event: SubmitEvent) => {
 		event.preventDefault();
@@ -15,7 +23,10 @@
 			const response = await fetch('/api/search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query: search_query }),
+				body: JSON.stringify({ 
+					query: search_query,
+					response_style: chat.response_style
+				}),
 			});
 
 			if (!response.ok) throw new Error('Search failed');
@@ -122,25 +133,41 @@
 				</div>
 
 				<form class="mt-4" onsubmit={handle_submit}>
-					<div class="join w-full">
-						<input
-							type="search"
-							bind:value={search_query}
-							class="input join-item input-bordered input-primary flex-1"
-							placeholder="Ask about SEO..."
-							disabled={chat.is_loading}
-						/>
-						<button
-							type="submit"
-							class="btn btn-primary join-item"
-							disabled={chat.is_loading || !search_query.trim()}
-						>
-							{#if chat.is_loading}
-								<span class="loading loading-spinner"></span>
-							{:else}
-								Ask
-							{/if}
-						</button>
+					<div class="flex flex-col gap-2">
+						<div class="join w-full">
+							<input
+								type="search"
+								bind:value={search_query}
+								class="input join-item input-bordered input-primary flex-1"
+								placeholder="Ask about SEO..."
+								disabled={chat.is_loading}
+							/>
+							<button
+								type="submit"
+								class="btn btn-primary join-item"
+								disabled={chat.is_loading || !search_query.trim()}
+							>
+								{#if chat.is_loading}
+									<span class="loading loading-spinner"></span>
+								{:else}
+									Ask
+								{/if}
+							</button>
+						</div>
+
+						<div class="flex justify-end items-center gap-2 opacity-75">
+							<label for="response-style" class="text-sm">Choose style:</label>
+							<select 
+								id="response-style"
+								class="select select-bordered select-sm max-w-[150px]"
+								bind:value={chat.response_style}
+								disabled={chat.is_loading}
+							>
+								{#each response_styles as style}
+									<option value={style.value}>{style.label}</option>
+								{/each}
+							</select>
+						</div>
 					</div>
 				</form>
 
