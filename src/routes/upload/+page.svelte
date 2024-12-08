@@ -1,59 +1,186 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { upload_progress } from '$lib/stores/upload-progress.svelte';
-	import { onMount } from 'svelte';
-	import type { ActionData } from './$types';
-
-	const form = $props<{ form: ActionData }>();
+	import { formatDuration, intervalToDuration } from 'date-fns';
 
 	let audio_file = $state<File | undefined>(undefined);
 	let episode_title = $state('');
 	let upload_error = $state('');
+	let event_source = $state<EventSource | null>(null);
+	let retry_count = $state(0);
+	let current_time = $state(Date.now());
+	let cleanup_timeout: NodeJS.Timeout | null = $state(null);
+	const MAX_RETRIES = 3;
 
-	// Subscribe to the store
+	// Format elapsed time in a human-readable way
+	function format_elapsed_time(start_time: number | null): string {
+		if (!start_time) return '';
+
+		const duration = intervalToDuration({
+			start: new Date(start_time),
+			end: new Date(current_time),
+		});
+
+		return formatDuration(duration, {
+			format: ['minutes', 'seconds'],
+			zero: false,
+			delimiter: ' and ',
+		});
+	}
+
+	// Track time updates only when processing
 	$effect(() => {
-		if (upload_progress.stage === 'completed') {
-			setTimeout(() => {
+		let interval: NodeJS.Timeout | null = null;
+		
+		if (upload_progress.is_processing) {
+			interval = setInterval(() => {
+				current_time = Date.now();
+			}, 1000);
+		}
+
+		return () => {
+			if (interval) {
+				clearInterval(interval);
+				interval = null;
+			}
+		};
+	});
+
+	// Handle cleanup of EventSource when component is destroyed
+	$effect(() => {
+		return () => {
+			cleanup_sse();
+		};
+	});
+
+	function cleanup_sse() {
+		if (event_source) {
+			// Remove all event listeners before closing
+			event_source.onmessage = null;
+			event_source.onerror = null;
+			event_source.onopen = null;
+			
+			event_source.close();
+			event_source = null;
+		}
+
+		if (cleanup_timeout) {
+			clearTimeout(cleanup_timeout);
+			cleanup_timeout = null;
+		}
+	}
+
+	function handle_completion() {
+		// Clear any existing cleanup timeout
+		if (cleanup_timeout) {
+			clearTimeout(cleanup_timeout);
+		}
+
+		// Set a new cleanup timeout
+		cleanup_timeout = setTimeout(() => {
+			cleanup_sse();
+			if (upload_progress.stage === 'completed') {
 				upload_progress.reset();
 				audio_file = undefined;
 				episode_title = '';
-			}, 5000);
-		}
-	});
+				retry_count = 0;
+			}
+			cleanup_timeout = null;
+		}, 1500);
+	}
 
-	onMount(() => {
+	function setup_sse_connection() {
+		// Clean up any existing connection
+		cleanup_sse();
+
+		// Reset upload progress before starting new connection
 		upload_progress.reset();
+		retry_count = 0;
 
-		// Set up SSE connection
-		const events = new EventSource('/api/upload-progress');
+		try {
+			// Set up new SSE connection
+			event_source = new EventSource('/api/upload-progress');
 
-		events.onmessage = (event) => {
-			const data = JSON.parse(event.data);
-			// Update the client-side store with the server's progress
-			upload_progress.update_progress({
-				stage: data.stage,
-				message: data.message,
-				progress: data.progress,
-				current: data.current,
-				total: data.total,
-				current_operation: data.current_operation,
-			});
-		};
+			event_source.onopen = () => {
+				retry_count = 0; // Reset retry count on successful connection
+				console.log('SSE connection established');
+			};
 
-		events.onerror = (error) => {
-			console.error('SSE Error:', error);
+			event_source.onmessage = (event) => {
+				try {
+					const data = JSON.parse(event.data);
+					// Update the client-side store with the server's progress
+					upload_progress.update_progress({
+						stage: data.stage,
+						message: data.message,
+						progress: data.progress,
+						current: data.current,
+						total: data.total,
+						current_operation: data.current_operation,
+					});
+
+					// Handle completion states immediately after updating progress
+					if (data.stage === 'completed' || data.stage === 'error') {
+						handle_completion();
+					}
+				} catch (err) {
+					console.error('Error parsing SSE message:', err);
+					handle_sse_error(new Error('Failed to parse server message'));
+				}
+			};
+
+			event_source.onerror = (error) => {
+				// Only handle error if we're not already in a completion state
+				if (upload_progress.stage !== 'completed' && upload_progress.stage !== 'error') {
+					handle_sse_error(error);
+				}
+			};
+		} catch (err) {
+			console.error('Error setting up SSE connection:', err);
+			handle_sse_error(err);
+		}
+	}
+
+	function handle_sse_error(error: any) {
+		console.error('SSE Error:', error);
+
+		// Only attempt retry if we haven't exceeded max retries and
+		// we're not in a completed or error state
+		if (
+			retry_count < MAX_RETRIES &&
+			upload_progress.stage !== 'completed' &&
+			upload_progress.stage !== 'error'
+		) {
+			retry_count++;
+			console.log(
+				`Retrying SSE connection (${retry_count}/${MAX_RETRIES})...`,
+			);
+
+			// Clean up the current connection
+			cleanup_sse();
+
+			// Attempt to reconnect after a delay with exponential backoff
+			const retry_delay = Math.min(
+				1000 * Math.pow(2, retry_count - 1),
+				5000,
+			);
+			setTimeout(() => {
+				if (
+					upload_progress.stage !== 'completed' &&
+					upload_progress.stage !== 'error'
+				) {
+					setup_sse_connection();
+				}
+			}, retry_delay);
+		} else if (upload_progress.stage !== 'completed' && upload_progress.stage !== 'error') {
+			cleanup_sse();
 			upload_progress.update_progress({
 				stage: 'error',
 				message: 'Connection lost. Please try again.',
 				progress: 0,
 			});
-			events.close();
-		};
-
-		return () => {
-			events.close();
-		};
-	});
+		}
+	}
 
 	function handle_file_change(event: Event) {
 		const target = event.target as HTMLInputElement;
@@ -80,6 +207,7 @@
 		formData.append('title', episode_title);
 
 		upload_error = '';
+		setup_sse_connection();
 		upload_progress.start_upload();
 
 		return async ({
@@ -180,7 +308,7 @@
 							</div>
 							{#if upload_progress.is_processing}
 								<span class="text-sm text-base-content/70">
-									{upload_progress.elapsed_time}s
+									{format_elapsed_time(upload_progress.start_time)}
 								</span>
 							{/if}
 						</div>

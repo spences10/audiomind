@@ -6,6 +6,7 @@ type ProgressState = {
     progress: number;
     current: number;
     total: number;
+    start_time: number | null;
 };
 
 const initial_state: ProgressState = {
@@ -13,7 +14,8 @@ const initial_state: ProgressState = {
     message: '',
     progress: 0,
     current: 0,
-    total: 0
+    total: 0,
+    start_time: null
 };
 
 const create_shared_progress = () => {

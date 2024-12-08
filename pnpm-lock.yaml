@@ -35,6 +35,9 @@ devDependencies:
   daisyui:
     specifier: ^4.12.14
     version: 4.12.14(postcss@8.4.49)
+  date-fns:
+    specifier: ^4.1.0
+    version: 4.1.0
   eslint:
     specifier: ^9.16.0
     version: 9.16.0
@@ -1377,6 +1380,10 @@ packages:
   /data-uri-to-buffer@4.0.1:
     resolution: {integrity: sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==}
     engines: {node: '>= 12'}
+    dev: true
+
+  /date-fns@4.1.0:
+    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
     dev: true
 
   /dayjs@1.11.13:

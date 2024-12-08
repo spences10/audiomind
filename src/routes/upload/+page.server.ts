@@ -15,9 +15,18 @@ interface Segment {
 export const actions = {
 	default: async ({ request }) => {
 		try {
+			shared_progress.reset();
+			
 			const formData = await request.formData();
 			const audio = formData.get('audio');
 			const title = formData.get('title');
+
+			shared_progress.update_progress({
+				stage: 'uploading',
+				message: 'Starting upload...',
+				progress: 0,
+				start_time: Date.now()
+			});
 
 			if (!audio || !(audio instanceof File)) {
 				shared_progress.update_progress({

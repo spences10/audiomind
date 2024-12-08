@@ -74,6 +74,16 @@ const create_upload_state = () => {
 			if (data.stage) {
 				state.stage = data.stage;
 				state.message = STAGE_DESCRIPTIONS[data.stage];
+				
+				// Set start time when transitioning to a processing stage
+				if (data.stage !== 'idle' && data.stage !== 'completed' && data.stage !== 'error') {
+					if (!state.start_time) {
+						state.start_time = Date.now();
+					}
+				} else if (data.stage === 'completed' || data.stage === 'error') {
+					// Keep the final elapsed time
+					state.start_time = state.start_time || Date.now() - 1000;
+				}
 			}
 
 			// Update other fields if provided
