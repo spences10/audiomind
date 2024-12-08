@@ -50,6 +50,9 @@ devDependencies:
   globals:
     specifier: ^15.13.0
     version: 15.13.0
+  lru-cache:
+    specifier: ^11.0.2
+    version: 11.0.2
   marked:
     specifier: ^15.0.3
     version: 15.0.3
@@ -2054,6 +2057,11 @@ packages:
 
   /lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
+    dev: true
+
+  /lru-cache@11.0.2:
+    resolution: {integrity: sha512-123qHRfJBmo2jXDbo/a5YOQrJoHF/GNQTLzQ5+IdK5pWpceK17yRc6ozlWd25FxvGKQbIUs91fDFkXmDHTKcyA==}
+    engines: {node: 20 || >=22}
     dev: true
 
   /magic-string@0.30.14:

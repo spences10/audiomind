@@ -1,16 +1,28 @@
 import { ANTHROPIC_API_KEY } from '$env/static/private';
+import {
+	cache_claude_response,
+	generate_claude_cache_key,
+	get_cached_claude_response,
+} from '$lib/server/cache';
 import type { SearchResult } from './similarity';
 
 export async function create_claude_stream(
 	query: string,
 	top_results: SearchResult[],
-	response_style: 'normal' | 'concise' | 'explanatory' | 'formal' = 'normal'
+	response_style:
+		| 'normal'
+		| 'concise'
+		| 'explanatory'
+		| 'formal' = 'normal',
 ): Promise<ReadableStream> {
 	const style_instructions = {
-		normal: "Respond in a balanced, straightforward manner.",
-		concise: "Keep responses brief and to the point, focusing only on essential information.",
-		explanatory: "Provide detailed explanations with examples and context where relevant.",
-		formal: "Use professional language and maintain a scholarly tone."
+		normal: 'Respond in a balanced, straightforward manner.',
+		concise:
+			'Keep responses brief and to the point, focusing only on essential information.',
+		explanatory:
+			'Provide detailed explanations with examples and context where relevant.',
+		formal:
+			'Use professional language and maintain a scholarly tone.',
 	};
 
 	return new ReadableStream({
@@ -21,6 +33,37 @@ export async function create_claude_stream(
 					JSON.stringify({ type: 'results', data: top_results }) +
 						'\n',
 				);
+
+				// Generate cache key based on query and context
+				const context_texts = top_results.map((r) => r.text);
+				const cache_key = generate_claude_cache_key(
+					query,
+					context_texts,
+				);
+
+				// Check cache first
+				const cached_response = get_cached_claude_response(cache_key);
+				if (cached_response) {
+					// Stream cached response in chunks to maintain streaming behavior
+					const chunk_size = 20;
+					for (
+						let i = 0;
+						i < cached_response.length;
+						i += chunk_size
+					) {
+						const chunk = cached_response.slice(i, i + chunk_size);
+						controller.enqueue(
+							JSON.stringify({
+								type: 'claude_response',
+								data: chunk,
+							}) + '\n',
+						);
+						// Small delay to simulate streaming
+						await new Promise((resolve) => setTimeout(resolve, 10));
+					}
+					controller.close();
+					return;
+				}
 
 				// Get Claude's response and stream it
 				const response = await fetch(
@@ -34,10 +77,9 @@ export async function create_claude_stream(
 							accept: 'text/event-stream',
 						},
 						body: JSON.stringify({
-							model: 'claude-3-5-sonnet-20241022',
+							model: 'claude-3-haiku-20240307', // Using faster Haiku model
 							max_tokens: 1024,
-							system:
-								`You are a direct and factual assistant. Your role is to analyze the provided podcast excerpts and answer questions using ONLY the information contained within them. Do not add personal opinions, recommendations, or commentary beyond what is explicitly stated in the excerpts. If the information needed isn't in the excerpts, simply state that fact without elaboration. ${style_instructions[response_style]}`,
+							system: `You are a direct and factual assistant. Your role is to analyze the provided podcast excerpts and answer questions using ONLY the information contained within them. Do not add personal opinions, recommendations, or commentary beyond what is explicitly stated in the excerpts. If the information needed isn't in the excerpts, simply state that fact without elaboration. ${style_instructions[response_style]}`,
 							messages: [
 								{
 									role: 'user',
@@ -65,6 +107,8 @@ Provide a response using only information from these excerpts. If the informatio
 				const reader = response.body?.getReader();
 				if (!reader) throw new Error('No reader available');
 
+				let full_response = '';
+
 				while (true) {
 					const { done, value } = await reader.read();
 					if (done) break;
@@ -81,6 +125,7 @@ Provide a response using only information from these excerpts. If the informatio
 									data.type === 'content_block_delta' &&
 									data.delta?.text
 								) {
+									full_response += data.delta.text;
 									controller.enqueue(
 										JSON.stringify({
 											type: 'claude_response',
@@ -95,6 +140,7 @@ Provide a response using only information from these excerpts. If the informatio
 									data.type === 'message_delta' &&
 									data.delta?.text
 								) {
+									full_response += data.delta.text;
 									controller.enqueue(
 										JSON.stringify({
 											type: 'claude_response',
@@ -108,6 +154,9 @@ Provide a response using only information from these excerpts. If the informatio
 						}
 					}
 				}
+
+				// Cache the complete response
+				cache_claude_response(cache_key, full_response);
 			} catch (error) {
 				console.error('Streaming error:', error);
 				controller.error(error);
