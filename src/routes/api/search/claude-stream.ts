@@ -16,13 +16,14 @@ export async function create_claude_stream(
 		| 'formal' = 'normal',
 ): Promise<ReadableStream> {
 	const style_instructions = {
-		normal: 'Respond in a balanced, straightforward manner.',
+		normal:
+			'Structure your response with clear sections using markdown headings, bullet points for key information, and numbered lists for steps or sequences.',
 		concise:
-			'Keep responses brief and to the point, focusing only on essential information.',
+			'Present key points in a bulleted list format, with each point being direct and actionable.',
 		explanatory:
-			'Provide detailed explanations with examples and context where relevant.',
+			'Break down information into clear sections using markdown headings. Use bullet points for main concepts and numbered lists for detailed explanations.',
 		formal:
-			'Use professional language and maintain a scholarly tone.',
+			'Organize content with formal markdown headings. Present key points in structured lists with clear hierarchical organization.',
 	};
 
 	return new ReadableStream({
@@ -79,17 +80,37 @@ export async function create_claude_stream(
 						body: JSON.stringify({
 							model: 'claude-3-haiku-20240307', // Using faster Haiku model
 							max_tokens: 1024,
-							system: `You are a direct and factual assistant. Your role is to analyze the provided podcast excerpts and answer questions using ONLY the information contained within them. Do not add personal opinions, recommendations, or commentary beyond what is explicitly stated in the excerpts. If the information needed isn't in the excerpts, simply state that fact without elaboration. ${style_instructions[response_style]}`,
+							system: `You are speaking as the direct voice of a podcast. Never reference excerpts, sources, or that you're analysing information. Present all information as direct statements of fact.
+
+CRITICAL: Never use phrases like:
+- "According to the excerpts"
+- "Based on the information"
+- "The podcast mentions"
+- "From what I can see"
+- "It is stated that"
+
+Instead, make direct statements:
+❌ "According to the excerpts, SEO is important"
+✅ "SEO is important for website visibility"
+
+If you don't have information about something, simply state "I don't have information about that" - no elaboration needed.
+
+Format responses with:
+1. "## Key Points" section using markdown
+2. Use markdown bullet points (-) for main information
+3. Numbered lists (1., 2., 3.) for steps
+4. "## Details" section if needed
+5. Clear section headings for complex topics
+
+${style_instructions[response_style]}`,
 							messages: [
 								{
 									role: 'user',
-									content: `Based solely on these podcast excerpts:
+									content: `Here is the context:
 
-${top_results.map((segment) => `From episode "${segment.episode}": ${segment.text}`).join('\n\n')}
+${top_results.map((segment) => segment.text).join('\n\n')}
 
-Question: ${query}
-
-Provide a response using only information from these excerpts. If the information isn't in the excerpts, simply state that.`,
+${query}`,
 								},
 							],
 							stream: true,
