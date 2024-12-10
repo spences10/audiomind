@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { CheckIcon, SendIcon, SettingsIcon } from '$lib/icons';
 	import type { ResponseStyle } from '$lib/stores/chat.svelte';
 
 	let {
@@ -21,43 +22,57 @@
 	];
 </script>
 
-<form class="mt-4" onsubmit={on_submit}>
-	<div class="flex flex-col gap-2">
-		<div class="join w-full">
-			<input
-				type="search"
-				bind:value={search_query}
-				class="input join-item input-bordered input-primary flex-1 text-xl"
-				placeholder="Ask about the audio content..."
-				disabled={is_loading}
-			/>
-			<button
-				type="submit"
-				class="btn btn-primary join-item"
-				disabled={is_loading || !search_query.trim()}
-			>
-				{#if is_loading}
-					<span class="loading loading-spinner"></span>
-				{:else}
-					Ask
-				{/if}
-			</button>
-		</div>
+<form class="flex items-center gap-2" onsubmit={on_submit}>
+	<div class="join flex-1">
+		<input
+			type="search"
+			bind:value={search_query}
+			class="input join-item input-bordered flex-1 bg-base-100 text-lg placeholder:text-base-content/50 focus:outline-none"
+			placeholder="Ask about the audio content..."
+			disabled={is_loading}
+		/>
+		<button
+			type="submit"
+			class="btn join-item bg-base-100 hover:bg-base-200"
+			disabled={is_loading || !search_query.trim()}
+		>
+			{#if is_loading}
+				<span class="loading loading-spinner"></span>
+			{:else}
+				<SendIcon class_names="h-5 w-5" />
+			{/if}
+		</button>
+	</div>
 
-		<div class="flex items-center justify-end gap-2 opacity-75">
-			<label for="response-style" class="text-sm">
-				Choose style:
-			</label>
-			<select
-				id="response-style"
-				class="select select-bordered select-sm max-w-[150px]"
-				bind:value={response_style}
-				disabled={is_loading}
-			>
-				{#each response_styles as style}
-					<option value={style.value}>{style.label}</option>
-				{/each}
-			</select>
-		</div>
+	<div class="dropdown dropdown-end dropdown-top">
+		<button
+			tabindex="0"
+			class="btn btn-ghost btn-sm"
+			title="Response Style"
+			disabled={is_loading}
+		>
+			<SettingsIcon class_names="h-5 w-5" />
+		</button>
+		<ul
+			tabindex="0"
+			class="menu dropdown-content z-50 w-52 rounded-box bg-base-200 p-2 shadow-xl"
+		>
+			{#each response_styles as style}
+				<li>
+					<button
+						class="flex items-center justify-between {response_style ===
+						style.value
+							? 'active'
+							: ''}"
+						onclick={() => (response_style = style.value)}
+					>
+						{style.label}
+						{#if response_style === style.value}
+							<CheckIcon class_names="h-4 w-4" />
+						{/if}
+					</button>
+				</li>
+			{/each}
+		</ul>
 	</div>
 </form>

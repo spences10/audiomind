@@ -13,14 +13,20 @@
 	let is_loading = $derived(props.is_loading ?? false);
 </script>
 
-<div class="chat {role === 'user' ? 'chat-end' : 'chat-start'} mb-4">
-	<div class="chat-header mb-1 opacity-75">
+<div
+	class="chat {role === 'user'
+		? 'chat-end'
+		: 'chat-start'} group relative mb-4"
+>
+	<div
+		class="chat-header mb-1 text-sm opacity-75 transition-opacity group-hover:opacity-100"
+	>
 		{role === 'user' ? 'You' : config.app_name}
 	</div>
 	<div
 		class="chat-bubble {role === 'user'
 			? 'chat-bubble-primary'
-			: 'chat-bubble-secondary'}"
+			: 'chat-bubble-secondary'} max-w-[80%] shadow-sm transition-all hover:shadow-md"
 	>
 		{#if is_loading && !content}
 			<span class="loading loading-dots loading-md"></span>

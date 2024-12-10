@@ -8,6 +8,7 @@
 
 	let search_query = $state('');
 	let event_source: EventSource | null = $state(null);
+	let has_messages = $derived(chat.messages.length > 0 || chat.current_response);
 
 	// Cleanup effect for EventSource
 	$effect(() => {
@@ -72,46 +73,78 @@
 	};
 </script>
 
-<h1 class="mb-8 text-center text-4xl font-bold text-primary">
-	{config.app_name}
-</h1>
-
-{#if config.app_description}
-	<p class="mb-8 text-center text-lg text-base-content/80">
-		{config.app_description}
-	</p>
-{/if}
-
-<article class="card bg-base-100 shadow-xl">
-	<div class="card-body">
-		<section aria-label="Chat Messages" class="mb-4 space-y-4">
-			{#each chat.messages as message}
-				<ChatMessage role={message.role} content={message.content} />
-			{/each}
-
-			{#if chat.current_response}
-				<ChatMessage
-					role="assistant"
-					content={chat.current_response}
+<div class="min-h-screen bg-base-100">
+	{#if !has_messages}
+		<!-- Initial centered view -->
+		<div class="flex min-h-screen flex-col items-center justify-center px-4">
+			<div class="mb-16 text-center">
+				<h1 class="mb-4 text-5xl font-bold text-primary">
+					{config.app_name}
+				</h1>
+				{#if config.app_description}
+					<p class="text-xl text-base-content/80">
+						{config.app_description}
+					</p>
+				{/if}
+			</div>
+			<div class="w-full max-w-3xl">
+				<ChatForm
+					bind:search_query
+					is_loading={chat.is_loading}
+					response_style={chat.response_style}
+					on_submit={handle_submit}
 				/>
-			{/if}
+			</div>
+		</div>
+	{:else}
+		<!-- Chat view -->
+		<div class="min-h-screen pb-32">
+			<!-- Messages -->
+			<div class="mx-auto max-w-3xl space-y-4 px-4 pt-8">
+				{#each chat.messages as message}
+					<ChatMessage
+						role={message.role}
+						content={message.content}
+					/>
+				{/each}
 
-			{#if chat.is_loading && !chat.current_response}
-				<ChatMessage role="assistant" content="" is_loading={true} />
-			{/if}
-		</section>
+				{#if chat.current_response}
+					<ChatMessage
+						role="assistant"
+						content={chat.current_response}
+					/>
+				{/if}
 
-		<section aria-label="Chat Input">
-			<ChatForm
-				bind:search_query
-				is_loading={chat.is_loading}
-				response_style={chat.response_style}
-				on_submit={handle_submit}
-			/>
-		</section>
+				{#if chat.is_loading && !chat.current_response}
+					<ChatMessage
+						role="assistant"
+						content=""
+						is_loading={true}
+					/>
+				{/if}
+			</div>
+		</div>
 
-		<section aria-label="Search Results">
-			<SearchResults results={chat.search_results} />
-		</section>
-	</div>
-</article>
+		<!-- Fixed bottom bar -->
+		<div class="fixed bottom-0 left-0 right-0 border-t bg-base-200/80 p-4 backdrop-blur">
+			<div class="mx-auto max-w-3xl">
+				<div class="flex items-start gap-4">
+					<!-- Search Results -->
+					<div class="flex-none">
+						<SearchResults results={chat.search_results} />
+					</div>
+
+					<!-- Chat Form -->
+					<div class="flex-1">
+						<ChatForm
+							bind:search_query
+							is_loading={chat.is_loading}
+							response_style={chat.response_style}
+							on_submit={handle_submit}
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
+	{/if}
+</div>
