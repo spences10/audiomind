@@ -1,5 +1,10 @@
 # AudioMind
 
+> **Note**: This started as a personal/toy project I created to ask
+> questions to podcasts I listen to. I've made it generic so others
+> can use it with their own audio content. Feel free to adapt it for
+> your needs!
+
 An MP3 to AI Chat Assistant - A configurable AI chat assistant that
 can be customized for your content and use case. Transform audio
 content into interactive, searchable conversations.
