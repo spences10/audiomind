@@ -71,49 +71,40 @@
 	};
 </script>
 
-<main class="min-h-screen bg-base-200 p-4">
-	<div class="container mx-auto max-w-4xl">
-		<header>
-			<h1 class="mb-8 text-center text-4xl font-bold text-primary">
-				Grumpy SEO Guy Podcast Chat
-			</h1>
-		</header>
+<h1 class="mb-8 text-center text-4xl font-bold text-primary">
+	Grumpy SEO Guy Podcast Chat
+</h1>
 
-		<section class="card bg-base-100 shadow-xl">
-			<div class="card-body">
-				<div class="mb-4 space-y-4">
-					{#each chat.messages as message}
-						<ChatMessage
-							role={message.role}
-							content={message.content}
-						/>
-					{/each}
+<article class="card bg-base-100 shadow-xl">
+	<div class="card-body">
+		<section aria-label="Chat Messages" class="mb-4 space-y-4">
+			{#each chat.messages as message}
+				<ChatMessage role={message.role} content={message.content} />
+			{/each}
 
-					{#if chat.current_response}
-						<ChatMessage
-							role="assistant"
-							content={chat.current_response}
-						/>
-					{/if}
-
-					{#if chat.is_loading && !chat.current_response}
-						<ChatMessage
-							role="assistant"
-							content=""
-							is_loading={true}
-						/>
-					{/if}
-				</div>
-
-				<ChatForm
-					bind:search_query
-					is_loading={chat.is_loading}
-					response_style={chat.response_style}
-					on_submit={handle_submit}
+			{#if chat.current_response}
+				<ChatMessage
+					role="assistant"
+					content={chat.current_response}
 				/>
+			{/if}
 
-				<SearchResults results={chat.search_results} />
-			</div>
+			{#if chat.is_loading && !chat.current_response}
+				<ChatMessage role="assistant" content="" is_loading={true} />
+			{/if}
+		</section>
+
+		<section aria-label="Chat Input">
+			<ChatForm
+				bind:search_query
+				is_loading={chat.is_loading}
+				response_style={chat.response_style}
+				on_submit={handle_submit}
+			/>
+		</section>
+
+		<section aria-label="Search Results">
+			<SearchResults results={chat.search_results} />
 		</section>
 	</div>
-</main>
+</article>

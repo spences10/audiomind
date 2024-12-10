@@ -27,7 +27,7 @@
 			<input
 				type="search"
 				bind:value={search_query}
-				class="input join-item input-bordered input-primary flex-1"
+				class="input join-item input-bordered input-primary flex-1 text-xl"
 				placeholder="Ask about SEO..."
 				disabled={is_loading}
 			/>
@@ -45,8 +45,9 @@
 		</div>
 
 		<div class="flex items-center justify-end gap-2 opacity-75">
-			<label for="response-style" class="text-sm">Choose style:</label
-			>
+			<label for="response-style" class="text-sm">
+				Choose style:
+			</label>
 			<select
 				id="response-style"
 				class="select select-bordered select-sm max-w-[150px]"

@@ -4,29 +4,24 @@
 	import { upload_progress } from '$lib/stores/upload-progress.svelte';
 </script>
 
-<main class="min-h-screen bg-base-200 p-4">
-	<div class="container mx-auto max-w-4xl">
-		<header>
-			<h1 class="mb-8 text-center text-4xl font-bold text-primary">
-				Upload Episode
-			</h1>
-		</header>
+<h1 class="text-4xl font-bold text-primary text-center mb-8">
+	Upload Episode
+</h1>
 
-		<section
-			class="card bg-base-100 shadow-xl"
-			aria-labelledby="upload-title"
-		>
-			<div class="card-body">
-				<h2 id="upload-title" class="card-title text-secondary">
-					Upload Episode
-				</h2>
+<article class="card bg-base-100 shadow-xl" aria-labelledby="upload-title">
+	<div class="card-body">
+		<h2 id="upload-title" class="card-title text-secondary">
+			Upload Episode
+		</h2>
 
-				{#if upload_progress.stage !== 'idle'}
-					<ProgressBar />
-				{/if}
+		<section aria-label="Upload Progress">
+			{#if upload_progress.stage !== 'idle'}
+				<ProgressBar />
+			{/if}
+		</section>
 
-				<UploadForm />
-			</div>
+		<section aria-label="Upload Form">
+			<UploadForm />
 		</section>
 	</div>
-</main>
+</article>

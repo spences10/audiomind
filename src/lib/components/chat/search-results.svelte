@@ -13,7 +13,7 @@
 </script>
 
 {#if results.length > 0}
-	<div class="collapse collapse-arrow mt-4">
+	<div class="collapse collapse-arrow mt-4 prose prose-sm">
 		<input type="checkbox" />
 		<div class="collapse-title text-xl font-medium">
 			Search Results
