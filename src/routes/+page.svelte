@@ -2,6 +2,7 @@
 	import ChatForm from '$lib/components/chat/chat-form.svelte';
 	import ChatMessage from '$lib/components/chat/chat-message.svelte';
 	import SearchResults from '$lib/components/chat/search-results.svelte';
+	import { config } from '$lib/config/app-config';
 	import { chat } from '$lib/stores/chat.svelte';
 	import { handle_stream_response } from '$lib/utils/chat/stream-handler';
 
@@ -72,8 +73,14 @@
 </script>
 
 <h1 class="mb-8 text-center text-4xl font-bold text-primary">
-	Grumpy SEO Guy Podcast Chat
+	{config.app_name}
 </h1>
+
+{#if config.app_description}
+	<p class="mb-8 text-center text-lg text-base-content/80">
+		{config.app_description}
+	</p>
+{/if}
 
 <article class="card bg-base-100 shadow-xl">
 	<div class="card-body">

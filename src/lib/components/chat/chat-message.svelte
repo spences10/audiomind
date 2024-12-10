@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { config } from '$lib/config/app-config';
 	import { marked } from 'marked';
 
 	let props = $props<{
@@ -14,12 +15,12 @@
 
 <div class="chat {role === 'user' ? 'chat-end' : 'chat-start'} mb-4">
 	<div class="chat-header mb-1 opacity-75">
-		{role === 'user' ? 'You' : 'Grumpy SEO Guy'}
+		{role === 'user' ? 'You' : config.app_name}
 	</div>
 	<div
 		class="chat-bubble {role === 'user'
 			? 'chat-bubble-primary'
-			: 'chat-bubble-accent'}"
+			: 'chat-bubble-secondary'}"
 	>
 		{#if is_loading && !content}
 			<span class="loading loading-dots loading-md"></span>

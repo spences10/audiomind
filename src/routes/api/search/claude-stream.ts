@@ -1,4 +1,5 @@
 import { ANTHROPIC_API_KEY } from '$env/static/private';
+import { config } from '$lib/config/app-config';
 import {
 	cache_claude_response,
 	generate_claude_cache_key,
@@ -13,19 +14,8 @@ export async function create_claude_stream(
 		| 'normal'
 		| 'concise'
 		| 'explanatory'
-		| 'formal' = 'normal',
+		| 'formal' = config.default_response_style,
 ): Promise<ReadableStream> {
-	const style_instructions = {
-		normal:
-			'Structure your response with clear sections using markdown headings, bullet points for key information, and numbered lists for steps or sequences.',
-		concise:
-			'Present key points in a bulleted list format, with each point being direct and actionable.',
-		explanatory:
-			'Break down information into clear sections using markdown headings. Use bullet points for main concepts and numbered lists for detailed explanations.',
-		formal:
-			'Organize content with formal markdown headings. Present key points in structured lists with clear hierarchical organization.',
-	};
-
 	return new ReadableStream({
 		async start(controller) {
 			try {
@@ -78,31 +68,11 @@ export async function create_claude_stream(
 							accept: 'text/event-stream',
 						},
 						body: JSON.stringify({
-							model: 'claude-3-haiku-20240307', // Using faster Haiku model
-							max_tokens: 1024,
-							system: `You are speaking as the direct voice of a podcast. Never reference excerpts, sources, or that you're analysing information. Present all information as direct statements of fact.
+							model: config.ai.model,
+							max_tokens: config.ai.max_tokens,
+							system: `${config.ai.system_prompt}
 
-CRITICAL: Never use phrases like:
-- "According to the excerpts"
-- "Based on the information"
-- "The podcast mentions"
-- "From what I can see"
-- "It is stated that"
-
-Instead, make direct statements:
-❌ "According to the excerpts, SEO is important"
-✅ "SEO is important for website visibility"
-
-If you don't have information about something, simply state "I don't have information about that" - no elaboration needed.
-
-Format responses with:
-1. "## Key Points" section using markdown
-2. Use markdown bullet points (-) for main information
-3. Numbered lists (1., 2., 3.) for steps
-4. "## Details" section if needed
-5. Clear section headings for complex topics
-
-${style_instructions[response_style]}`,
+${config.ai.style_instructions[response_style].instruction}`,
 							messages: [
 								{
 									role: 'user',

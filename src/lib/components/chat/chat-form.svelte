@@ -28,7 +28,7 @@
 				type="search"
 				bind:value={search_query}
 				class="input join-item input-bordered input-primary flex-1 text-xl"
-				placeholder="Ask about SEO..."
+				placeholder="Ask about the audio content..."
 				disabled={is_loading}
 			/>
 			<button
