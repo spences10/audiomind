@@ -22,7 +22,7 @@
 			requestAnimationFrame(() => {
 				messages_container?.scrollTo({
 					top: messages_container.scrollHeight,
-					behavior: 'auto'
+					behavior: 'auto',
 				});
 			});
 		}
@@ -36,7 +36,7 @@
 		requestAnimationFrame(() => {
 			messages_container?.scrollTo({
 				top: messages_container.scrollHeight,
-				behavior: 'smooth'
+				behavior: 'smooth',
 			});
 		});
 	});
@@ -108,9 +108,9 @@
 	{#if !has_messages}
 		<!-- Initial centred view -->
 		<div
-			class="flex flex-1 flex-col items-center justify-center px-4"
+			class="relative flex flex-1 flex-col items-center justify-center px-4"
 		>
-			<div class="mb-2 text-center">
+			<div class="fixed left-0 right-0 top-12 text-center">
 				<h1 class="mb-4 text-5xl font-bold text-primary">
 					{config.app_name}
 				</h1>
@@ -120,7 +120,7 @@
 					</p>
 				{/if}
 			</div>
-			<div class="w-full max-w-3xl">
+			<div class="-mt-8 w-full max-w-3xl">
 				<ChatForm
 					bind:search_query
 					is_loading={chat.is_loading}
@@ -133,7 +133,7 @@
 		<!-- Chat view -->
 		<div class="relative flex flex-1 justify-center bg-base-200/50">
 			<div class="absolute inset-0 overflow-hidden">
-				<div 
+				<div
 					bind:this={messages_container}
 					class="h-full overflow-y-auto scroll-smooth"
 				>
