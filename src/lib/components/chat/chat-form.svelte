@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { config } from '$lib/config/app-config';
 	import { CheckIcon, SendIcon, SettingsIcon } from '$lib/icons';
 	import type { ResponseStyle } from '$lib/stores/chat.svelte';
 
@@ -14,12 +15,13 @@
 		on_submit: (event: SubmitEvent) => void;
 	}>();
 
-	const response_styles: { value: ResponseStyle; label: string }[] = [
-		{ value: 'normal', label: 'Normal' },
-		{ value: 'concise', label: 'Concise' },
-		{ value: 'explanatory', label: 'Explanatory' },
-		{ value: 'formal', label: 'Formal' },
-	];
+	const response_styles = Object.entries(
+		config.ai.style_instructions,
+	).map(([value, { description }]) => ({
+		value: value as ResponseStyle,
+		label: value.charAt(0).toUpperCase() + value.slice(1),
+		description,
+	}));
 </script>
 
 <form class="flex items-center gap-2" onsubmit={on_submit}>
@@ -65,6 +67,7 @@
 							? 'active'
 							: ''}"
 						onclick={() => (response_style = style.value)}
+						title={style.description}
 					>
 						{style.label}
 						{#if response_style === style.value}
