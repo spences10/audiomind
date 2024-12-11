@@ -106,7 +106,7 @@
 
 <div class="flex h-screen flex-col bg-base-100">
 	{#if !has_messages}
-		<!-- Initial centered view -->
+		<!-- Initial centred view -->
 		<div
 			class="flex flex-1 flex-col items-center justify-center px-4"
 		>
