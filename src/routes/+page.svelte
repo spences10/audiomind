@@ -75,7 +75,7 @@
 
 <div class="min-h-screen bg-base-100">
 	{#if !has_messages}
-		<!-- Initial centered view -->
+		<!-- Initial centred view -->
 		<div class="flex min-h-screen flex-col items-center justify-center px-4">
 			<div class="mb-16 text-center">
 				<h1 class="mb-4 text-5xl font-bold text-primary">
