@@ -8,7 +8,38 @@
 
 	let search_query = $state('');
 	let event_source: EventSource | null = $state(null);
-	let has_messages = $derived(chat.messages.length > 0 || chat.current_response);
+	let has_messages = $derived(
+		chat.messages.length > 0 || chat.current_response,
+	);
+	let messages_container = $state<HTMLDivElement | null>(null);
+
+	// Auto scroll to bottom when messages change or during streaming
+	$effect(() => {
+		if (!messages_container) return;
+
+		// Always scroll on new messages
+		if (chat.messages.length) {
+			requestAnimationFrame(() => {
+				messages_container?.scrollTo({
+					top: messages_container.scrollHeight,
+					behavior: 'auto'
+				});
+			});
+		}
+	});
+
+	// Handle streaming scroll
+	$effect(() => {
+		if (!messages_container || !chat.current_response) return;
+
+		// During streaming, use smooth scroll
+		requestAnimationFrame(() => {
+			messages_container?.scrollTo({
+				top: messages_container.scrollHeight,
+				behavior: 'smooth'
+			});
+		});
+	});
 
 	// Cleanup effect for EventSource
 	$effect(() => {
@@ -73,11 +104,13 @@
 	};
 </script>
 
-<div class="min-h-screen bg-base-100">
+<div class="flex h-screen flex-col bg-base-100">
 	{#if !has_messages}
-		<!-- Initial centred view -->
-		<div class="flex min-h-screen flex-col items-center justify-center px-4">
-			<div class="mb-16 text-center">
+		<!-- Initial centered view -->
+		<div
+			class="flex flex-1 flex-col items-center justify-center px-4"
+		>
+			<div class="mb-2 text-center">
 				<h1 class="mb-4 text-5xl font-bold text-primary">
 					{config.app_name}
 				</h1>
@@ -98,36 +131,44 @@
 		</div>
 	{:else}
 		<!-- Chat view -->
-		<div class="min-h-screen pb-32">
-			<!-- Messages -->
-			<div class="mx-auto max-w-3xl space-y-4 px-4 pt-8">
-				{#each chat.messages as message}
-					<ChatMessage
-						role={message.role}
-						content={message.content}
-					/>
-				{/each}
+		<div class="relative flex flex-1 justify-center bg-base-200/50">
+			<div class="absolute inset-0 overflow-hidden">
+				<div 
+					bind:this={messages_container}
+					class="h-full overflow-y-auto scroll-smooth"
+				>
+					<div class="mx-auto w-full max-w-3xl px-4">
+						<div class="space-y-4 py-8 pb-32">
+							{#each chat.messages as message}
+								<ChatMessage
+									role={message.role}
+									content={message.content}
+								/>
+							{/each}
 
-				{#if chat.current_response}
-					<ChatMessage
-						role="assistant"
-						content={chat.current_response}
-					/>
-				{/if}
+							{#if chat.current_response}
+								<ChatMessage
+									role="assistant"
+									content={chat.current_response}
+								/>
+							{/if}
 
-				{#if chat.is_loading && !chat.current_response}
-					<ChatMessage
-						role="assistant"
-						content=""
-						is_loading={true}
-					/>
-				{/if}
+							{#if chat.is_loading && !chat.current_response}
+								<ChatMessage
+									role="assistant"
+									content=""
+									is_loading={true}
+								/>
+							{/if}
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 
 		<!-- Fixed bottom bar -->
-		<div class="fixed bottom-0 left-0 right-0 border-t bg-base-200/80 p-4 backdrop-blur">
-			<div class="mx-auto max-w-3xl">
+		<div class="border-t bg-base-100 shadow-lg">
+			<div class="mx-auto w-full max-w-3xl p-4">
 				<div class="flex items-start gap-4">
 					<!-- Search Results -->
 					<div class="flex-none">
