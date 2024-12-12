@@ -55,6 +55,7 @@
 		>
 			<SettingsIcon class_names="h-5 w-5" />
 		</button>
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 		<ul
 			tabindex="0"
 			class="menu dropdown-content z-50 w-52 rounded-box bg-base-200 p-2 shadow-xl"
