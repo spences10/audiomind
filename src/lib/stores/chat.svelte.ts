@@ -5,7 +5,11 @@ type SearchResult = {
 	similarity: number;
 };
 
-export type ResponseStyle = 'normal' | 'concise' | 'explanatory' | 'formal';
+export type ResponseStyle =
+	| 'normal'
+	| 'concise'
+	| 'explanatory'
+	| 'formal';
 
 export class ChatStore {
 	messages = $state<Message[]>([]);

@@ -1,10 +1,10 @@
-import { fail } from '@sveltejs/kit';
-import type { Actions } from './$types';
 import { db } from '$lib/server/database';
 import { transcribe_audio } from '$lib/server/deepgram';
+import { shared_progress } from '$lib/server/shared-progress';
 import { generate_embedding } from '$lib/server/voyage';
 import type { ResultSet } from '@libsql/client';
-import { shared_progress } from '$lib/server/shared-progress';
+import { fail } from '@sveltejs/kit';
+import type { Actions } from './$types';
 
 interface Segment {
 	text: string;
@@ -16,7 +16,7 @@ export const actions = {
 	default: async ({ request }) => {
 		try {
 			shared_progress.reset();
-			
+
 			const formData = await request.formData();
 			const audio = formData.get('audio');
 			const title = formData.get('title');
@@ -25,14 +25,14 @@ export const actions = {
 				stage: 'uploading',
 				message: 'Starting upload...',
 				progress: 0,
-				start_time: Date.now()
+				start_time: Date.now(),
 			});
 
 			if (!audio || !(audio instanceof File)) {
 				shared_progress.update_progress({
 					stage: 'error',
 					message: 'Missing or invalid audio file',
-					progress: 0
+					progress: 0,
 				});
 				return fail(400, { error: 'Missing or invalid audio file' });
 			}
@@ -41,28 +41,37 @@ export const actions = {
 				shared_progress.update_progress({
 					stage: 'error',
 					message: 'Missing or invalid episode title',
-					progress: 0
+					progress: 0,
 				});
-				return fail(400, { error: 'Missing or invalid episode title' });
+				return fail(400, {
+					error: 'Missing or invalid episode title',
+				});
 			}
 
 			const buffer = await audio.arrayBuffer();
-			
+
 			shared_progress.update_progress({
 				stage: 'transcribing',
 				message: `Starting transcription for: ${title}`,
-				progress: 0
+				progress: 0,
 			});
 
 			const segments = (await transcribe_audio(buffer)) as Segment[];
 
-			if (!segments || !Array.isArray(segments) || segments.length === 0) {
+			if (
+				!segments ||
+				!Array.isArray(segments) ||
+				segments.length === 0
+			) {
 				shared_progress.update_progress({
 					stage: 'error',
-					message: 'Failed to transcribe audio or no segments produced',
-					progress: 0
+					message:
+						'Failed to transcribe audio or no segments produced',
+					progress: 0,
 				});
-				return fail(400, { error: 'Failed to transcribe audio or no segments produced' });
+				return fail(400, {
+					error: 'Failed to transcribe audio or no segments produced',
+				});
 			}
 
 			const total_segments = segments.length;
@@ -73,12 +82,15 @@ export const actions = {
 				message: `Processing ${segments.length} segments for episode: ${title}`,
 				current: processed_count,
 				total: total_segments,
-				progress: 0
+				progress: 0,
 			});
 
 			for (const segment of segments) {
 				if (!segment.text || typeof segment.text !== 'string') {
-					console.warn('Skipping segment with invalid text:', segment);
+					console.warn(
+						'Skipping segment with invalid text:',
+						segment,
+					);
 					continue;
 				}
 
@@ -93,7 +105,9 @@ export const actions = {
 
 				const transcriptId = insertResult.rows[0]?.id;
 				if (typeof transcriptId !== 'number') {
-					throw new Error('Failed to get transcript ID after insertion');
+					throw new Error(
+						'Failed to get transcript ID after insertion',
+					);
 				}
 
 				const embedding = await generate_embedding(segment.text);
@@ -104,17 +118,17 @@ export const actions = {
 				});
 
 				processed_count++;
-				
+
 				shared_progress.update_progress({
 					stage: 'processing_segments',
 					message: `Processing segment ${processed_count}/${total_segments}`,
 					current: processed_count,
 					total: total_segments,
-					progress: (processed_count / total_segments) * 100
+					progress: (processed_count / total_segments) * 100,
 				});
 
 				// Small delay to prevent overwhelming the client
-				await new Promise(resolve => setTimeout(resolve, 10));
+				await new Promise((resolve) => setTimeout(resolve, 10));
 			}
 
 			shared_progress.update_progress({
@@ -122,26 +136,28 @@ export const actions = {
 				message: `Successfully processed ${processed_count} out of ${total_segments} segments`,
 				current: processed_count,
 				total: total_segments,
-				progress: 100
+				progress: 100,
 			});
 
 			return {
 				success: true,
 				processed_segments: processed_count,
-				total_segments
+				total_segments,
 			};
-
 		} catch (err) {
 			console.error('Process episode error:', err);
-			const error_message = err instanceof Error ? err.message : 'Unknown error';
-			
+			const error_message =
+				err instanceof Error ? err.message : 'Unknown error';
+
 			shared_progress.update_progress({
 				stage: 'error',
 				message: error_message,
-				progress: 0
+				progress: 0,
 			});
 
-			return fail(500, { error: 'Failed to process episode: ' + error_message });
+			return fail(500, {
+				error: 'Failed to process episode: ' + error_message,
+			});
 		}
-	}
+	},
 } satisfies Actions;

@@ -4,11 +4,14 @@
 	import { upload_progress } from '$lib/stores/upload-progress.svelte';
 </script>
 
-<h1 class="text-4xl font-bold text-primary text-center mb-8">
+<h1 class="text-primary mb-8 text-center text-4xl font-bold">
 	Upload Episode
 </h1>
 
-<article class="card bg-base-100 shadow-xl" aria-labelledby="upload-title">
+<article
+	class="card bg-base-100 shadow-xl"
+	aria-labelledby="upload-title"
+>
 	<div class="card-body">
 		<h2 id="upload-title" class="card-title text-secondary">
 			Upload Episode

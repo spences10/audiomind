@@ -29,7 +29,7 @@
 		<input
 			type="search"
 			bind:value={search_query}
-			class="input join-item input-bordered flex-1 bg-base-100 text-lg placeholder:text-base-content/50 focus:outline-none"
+			class="input join-item input-bordered bg-base-100 placeholder:text-base-content/50 flex-1 text-lg focus:outline-none"
 			placeholder="Ask about the audio content..."
 			disabled={is_loading}
 		/>
@@ -58,7 +58,7 @@
 		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 		<ul
 			tabindex="0"
-			class="menu dropdown-content z-50 w-52 rounded-box bg-base-200 p-2 shadow-xl"
+			class="menu dropdown-content rounded-box bg-base-200 z-50 w-52 p-2 shadow-xl"
 		>
 			{#each response_styles as style}
 				<li>

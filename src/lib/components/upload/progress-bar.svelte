@@ -56,14 +56,14 @@
 			>
 		</div>
 		{#if upload_progress.is_processing}
-			<span class="text-sm text-base-content/70">
+			<span class="text-base-content/70 text-sm">
 				{format_elapsed_time(upload_progress.start_time)}
 			</span>
 		{/if}
 	</div>
 
 	{#if upload_progress.current_operation}
-		<p class="text-sm text-base-content/70">
+		<p class="text-base-content/70 text-sm">
 			{upload_progress.current_operation}
 			{#if upload_progress.total > 0}
 				({upload_progress.current}/{upload_progress.total})

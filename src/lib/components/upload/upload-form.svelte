@@ -117,7 +117,7 @@
 				Choose File
 			</label>
 			<span
-				class="ml-3 flex items-center text-base-content/70"
+				class="text-base-content/70 ml-3 flex items-center"
 				aria-live="polite"
 			>
 				{audio_file?.name || 'No file chosen'}

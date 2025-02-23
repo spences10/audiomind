@@ -19,7 +19,10 @@ export async function transcribe_audio(audio_buffer: ArrayBuffer) {
 		});
 
 		// Estimate timeout based on file size (minimum 30 seconds)
-		const estimated_timeout = Math.min(MAX_TIMEOUT, Math.max(30000, file_size_mb * 5000));
+		const estimated_timeout = Math.min(
+			MAX_TIMEOUT,
+			Math.max(30000, file_size_mb * 5000),
+		);
 
 		// Update progress to indicate we're starting the API call
 		upload_progress.update_progress({
@@ -28,20 +31,21 @@ export async function transcribe_audio(audio_buffer: ArrayBuffer) {
 		});
 
 		const controller = new AbortController();
-		const timeout = setTimeout(() => controller.abort(), estimated_timeout);
+		const timeout = setTimeout(
+			() => controller.abort(),
+			estimated_timeout,
+		);
 
 		try {
-			const { result, error } = await deepgram.listen.prerecorded.transcribeFile(
-				buffer,
-				{
+			const { result, error } =
+				await deepgram.listen.prerecorded.transcribeFile(buffer, {
 					model: 'nova-2',
 					smart_format: true,
 					utterances: true,
 					options: {
-						signal: controller.signal
-					}
-				}
-			);
+						signal: controller.signal,
+					},
+				});
 
 			clearTimeout(timeout);
 
@@ -52,10 +56,14 @@ export async function transcribe_audio(audio_buffer: ArrayBuffer) {
 			});
 
 			if (error) {
-				throw new Error(`Deepgram transcription error: ${error.message}`);
+				throw new Error(
+					`Deepgram transcription error: ${error.message}`,
+				);
 			}
 
-			const paragraphs = result?.results?.channels?.[0]?.alternatives?.[0]?.paragraphs?.paragraphs;
+			const paragraphs =
+				result?.results?.channels?.[0]?.alternatives?.[0]?.paragraphs
+					?.paragraphs;
 
 			if (!paragraphs) {
 				throw new Error('No transcription results found');
@@ -68,7 +76,10 @@ export async function transcribe_audio(audio_buffer: ArrayBuffer) {
 			});
 
 			return paragraphs.map((para: any) => {
-				const combinedText = para.sentences?.map((sentence: any) => sentence.text)?.join(' ') || '';
+				const combinedText =
+					para.sentences
+						?.map((sentence: any) => sentence.text)
+						?.join(' ') || '';
 				return {
 					text: combinedText,
 					start: para.start || 0,
@@ -78,7 +89,9 @@ export async function transcribe_audio(audio_buffer: ArrayBuffer) {
 		} catch (err: unknown) {
 			clearTimeout(timeout);
 			if (err instanceof Error && err.name === 'AbortError') {
-				throw new Error(`Transcription timed out after ${Math.round(estimated_timeout / 1000)} seconds. Try again or use a smaller file.`);
+				throw new Error(
+					`Transcription timed out after ${Math.round(estimated_timeout / 1000)} seconds. Try again or use a smaller file.`,
+				);
 			}
 			throw err;
 		}

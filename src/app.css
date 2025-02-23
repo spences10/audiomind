@@ -1,3 +1,17 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+/* Import Tailwind */
+@import 'tailwindcss';
+
+/* Plugin configurations */
+@plugin "@tailwindcss/typography";
+
+@layer base {
+	:where(html) {
+		max-width: initial;
+	}
+}
+
+@plugin "daisyui" {
+	themes:
+		light --default,
+		dark --prefersdark;
+}

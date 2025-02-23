@@ -104,18 +104,18 @@
 	};
 </script>
 
-<div class="flex h-screen flex-col bg-base-100">
+<div class="bg-base-100 flex h-screen flex-col">
 	{#if !has_messages}
 		<!-- Initial centred view -->
 		<div
 			class="relative flex flex-1 flex-col items-center justify-center px-4"
 		>
-			<div class="fixed left-0 right-0 top-12 text-center">
-				<h1 class="mb-4 text-5xl font-bold text-primary">
+			<div class="fixed top-12 right-0 left-0 text-center">
+				<h1 class="text-primary mb-4 text-5xl font-bold">
 					{config.app_name}
 				</h1>
 				{#if config.app_description}
-					<p class="text-xl text-base-content/80">
+					<p class="text-base-content/80 text-xl">
 						{config.app_description}
 					</p>
 				{/if}
@@ -131,7 +131,7 @@
 		</div>
 	{:else}
 		<!-- Chat view -->
-		<div class="relative flex flex-1 justify-center bg-base-200/50">
+		<div class="bg-base-200/50 relative flex flex-1 justify-center">
 			<div class="absolute inset-0 overflow-hidden">
 				<div
 					bind:this={messages_container}
@@ -167,7 +167,7 @@
 		</div>
 
 		<!-- Fixed bottom bar -->
-		<div class="border-t bg-base-100 shadow-lg">
+		<div class="bg-base-100 border-t shadow-lg">
 			<div class="mx-auto w-full max-w-3xl p-4">
 				<div class="flex items-start gap-4">
 					<!-- Search Results -->
