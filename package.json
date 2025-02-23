@@ -34,7 +34,7 @@
 		"eslint": "^9.18.0",
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-svelte": "^2.46.1",
-		"globals": "^15.14.0",
+		"globals": "^16.0.0",
 		"jsdom": "^25.0.1",
 		"lru-cache": "^11.0.2",
 		"marked": "^15.0.7",
