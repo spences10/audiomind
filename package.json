@@ -17,10 +17,10 @@
 		"test:e2e": "playwright test"
 	},
 	"devDependencies": {
-		"@deepgram/sdk": "^3.11.2",
+		"@deepgram/sdk": "^3.11.3",
 		"@eslint/compat": "^1.2.7",
 		"@eslint/js": "^9.23.0",
-		"@libsql/client": "^0.14.0",
+		"@libsql/client": "^0.15.1",
 		"@playwright/test": "^1.51.1",
 		"@sveltejs/adapter-auto": "^4.0.0",
 		"@sveltejs/kit": "^2.20.2",
