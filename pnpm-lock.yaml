@@ -10,7 +10,7 @@ importers:
     devDependencies:
       '@deepgram/sdk':
         specifier: ^4.6.0
-        version: 4.6.0
+        version: 4.7.0
       '@eslint/compat':
         specifier: ^1.3.0
         version: 1.3.0(eslint@9.29.0(jiti@2.4.2))
@@ -158,8 +158,8 @@ packages:
     resolution: {integrity: sha512-8B1C/oTxTxyHlSFubAhNRgCbQ2SQ5wwvtlByn8sDYZvdDtdn/VE2yEPZ4BvUnrKWmsbTQY6/ooLV+9Ka2qmDSQ==}
     engines: {node: '>=18.0.0'}
 
-  '@deepgram/sdk@4.6.0':
-    resolution: {integrity: sha512-nZIfug60Fo36QJt2F/enOp1DBaFx+Q+dikfvfZzO40RJ03CimVY4QQcHk+84nubukxJ25K38uh+SscVq7RedsQ==}
+  '@deepgram/sdk@4.7.0':
+    resolution: {integrity: sha512-3SC7tvwzReH2bctehjob8BD3YBINw85DGN22Mk+IDFB2xPCrFlpDyDBBDbA831HIstoIqvg4yLrkz5sI9mGm+g==}
     engines: {node: '>=18.0.0'}
 
   '@esbuild/aix-ppc64@0.25.0':
@@ -756,8 +756,8 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/node@18.19.76':
-    resolution: {integrity: sha512-yvR7Q9LdPz2vGpmpJX5LolrgRdWvB67MJKDPSgIIzpFbaf9a1j/f5DnLp5VDyHGMR0QZHlTr1afsD87QCXFHKw==}
+  '@types/node@18.19.112':
+    resolution: {integrity: sha512-i+Vukt9POdS/MBI7YrrkkI5fMfwFtOjphSmt4WXYLfwqsfr6z/HdCx7LqT9M7JktGob8WNgj8nFB4TbGNE4Cog==}
 
   '@types/node@22.15.20':
     resolution: {integrity: sha512-A6BohGFRGHAscJsTslDCA9JG7qSJr/DWUvrvY8yi9IgnGtMxCyat7vvQ//MFa0DnLsyuS3wYTpLdw4Hf+Q5JXw==}
@@ -2145,10 +2145,10 @@ snapshots:
     dependencies:
       dayjs: 1.11.13
 
-  '@deepgram/sdk@4.6.0':
+  '@deepgram/sdk@4.7.0':
     dependencies:
       '@deepgram/captions': 1.2.0
-      '@types/node': 18.19.76
+      '@types/node': 18.19.112
       cross-fetch: 3.2.0
       deepmerge: 4.3.1
       events: 3.3.0
@@ -2630,7 +2630,7 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/node@18.19.76':
+  '@types/node@18.19.112':
     dependencies:
       undici-types: 5.26.5
 
