@@ -45,8 +45,8 @@ importers:
         specifier: ^5.2.8
         version: 5.2.8(svelte@5.39.8)(vite@7.1.9(@types/node@24.1.0)(jiti@2.6.1)(lightningcss@1.30.1))(vitest@3.2.4(@types/node@24.1.0)(jiti@2.6.1)(jsdom@27.0.0(postcss@8.5.6))(lightningcss@1.30.1))
       daisyui:
-        specifier: 5.1.27
-        version: 5.1.27
+        specifier: 5.2.3
+        version: 5.2.3
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -1004,8 +1004,8 @@ packages:
     resolution: {integrity: sha512-RveJPnk3m7aarYQ2bJ6iw+Urh55S6FzUiqtBq+TihnTDP4cI8y/TYDqGOyqgnG1J1a6BxJXZsV9JFSTulm9Z7g==}
     engines: {node: '>=20'}
 
-  daisyui@5.1.27:
-    resolution: {integrity: sha512-oCC2RwjrGRPTeEpaXoNmYydzVfSRdyJCthFsi/Q5PErAvaoD8kDarxlW+wiPAx2WmM8W8lXvyAHJUqjObCMWOQ==}
+  daisyui@5.2.3:
+    resolution: {integrity: sha512-sldBQUIFCsSPoF4LvoHhIi9GnvBX/3aZD9NoTOvpTSX8sDjO484wQx7yEvRyREMpn4rZMvQSKKskHAHdM8+B4Q==}
 
   data-uri-to-buffer@4.0.1:
     resolution: {integrity: sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==}
@@ -2928,7 +2928,7 @@ snapshots:
     transitivePeerDependencies:
       - postcss
 
-  daisyui@5.1.27: {}
+  daisyui@5.2.3: {}
 
   data-uri-to-buffer@4.0.1: {}
 
