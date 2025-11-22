@@ -18,7 +18,7 @@
 	},
 	"devDependencies": {
 		"@deepgram/sdk": "^4.11.2",
-		"@eslint/compat": "^1.4.0",
+		"@eslint/compat": "^2.0.0",
 		"@eslint/js": "^9.39.1",
 		"@libsql/client": "^0.15.15",
 		"@playwright/test": "^1.56.1",
