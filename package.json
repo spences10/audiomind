@@ -18,11 +18,11 @@
 	},
 	"devDependencies": {
 		"@deepgram/sdk": "^4.11.2",
-		"@eslint/compat": "^1.4.0",
+		"@eslint/compat": "^2.0.0",
 		"@eslint/js": "^9.39.1",
 		"@libsql/client": "^0.15.15",
 		"@playwright/test": "^1.57.0",
-		"@sveltejs/adapter-auto": "^6.1.1",
+		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/kit": "^2.49.1",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@tailwindcss/typography": "^0.5.19",
@@ -37,7 +37,7 @@
 		"globals": "^16.5.0",
 		"jsdom": "^27.2.0",
 		"lru-cache": "^11.2.4",
-		"marked": "^16.4.1",
+		"marked": "^17.0.1",
 		"prettier": "^3.7.4",
 		"prettier-plugin-svelte": "^3.4.0",
 		"prettier-plugin-tailwindcss": "^0.7.1",
@@ -47,7 +47,7 @@
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.48.1",
 		"vite": "^7.2.6",
-		"vitest": "^3.2.4"
+		"vitest": "^4.0.15"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
