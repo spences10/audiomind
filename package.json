@@ -25,6 +25,7 @@
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.1.17",
+		"@types/better-sqlite3": "^7.6.13",
 		"@types/node": "^22",
 		"@vitest/browser-playwright": "^4.0.15",
 		"eslint": "^9.39.1",
@@ -43,5 +44,9 @@
 		"vite": "^7.2.6",
 		"vitest": "^4.0.15",
 		"vitest-browser-svelte": "^2.0.1"
+	},
+	"dependencies": {
+		"better-sqlite3": "^12.5.0",
+		"sqlite-vec": "0.1.7-alpha.2"
 	}
 }
