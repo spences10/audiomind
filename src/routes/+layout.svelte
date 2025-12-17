@@ -1,10 +1,9 @@
 <script lang="ts">
-	import '../app.css';
+	import './layout.css';
+	import favicon from '$lib/assets/favicon.svg';
+
 	let { children } = $props();
 </script>
 
-<main class="bg-base-200 min-h-screen">
-	<div class="prose prose-lg container mx-auto max-w-4xl">
-		{@render children()}
-	</div>
-</main>
+<svelte:head><link rel="icon" href={favicon} /></svelte:head>
+{@render children()}
