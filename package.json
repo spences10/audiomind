@@ -65,6 +65,7 @@
 		"citty": "^0.1.6",
 		"date-fns": "^4.1.0",
 		"mode-watcher": "^1.1.0",
+		"music-metadata": "^11.10.3",
 		"runed": "^0.37.0",
 		"sqlite-vec": "0.1.7-alpha.2",
 		"svelte-exmarkdown": "^5.0.2",

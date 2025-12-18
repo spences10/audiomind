@@ -1,15 +1,19 @@
 #!/usr/bin/env node
 
+import Database from 'better-sqlite3';
 import { defineCommand, runMain } from 'citty';
+import { parseFile } from 'music-metadata';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import Database from 'better-sqlite3';
 import * as sqlite_vec from 'sqlite-vec';
 
 // Resolve paths relative to project root
 const PROJECT_ROOT = resolve(import.meta.dirname, '../..');
 const DB_PATH = resolve(PROJECT_ROOT, 'data/audiomind.db');
-const SCHEMA_PATH = resolve(PROJECT_ROOT, 'src/lib/server/schema.sql');
+const SCHEMA_PATH = resolve(
+	PROJECT_ROOT,
+	'src/lib/server/schema.sql',
+);
 
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY;
 const VOYAGE_API_KEY = process.env.VOYAGE_API_KEY;
@@ -33,12 +37,54 @@ function get_db(): Database.Database {
 	return db;
 }
 
+// --- Audio Metadata ---
+interface AudioMetadata {
+	title?: string;
+	album?: string;
+	artist?: string;
+	year?: number;
+	genre?: string[];
+	description?: string;
+	duration?: number;
+}
+
+async function get_audio_metadata(
+	audio_path: string,
+): Promise<AudioMetadata> {
+	const metadata = await parseFile(audio_path);
+	const common = metadata.common;
+
+	// Extract description from lyrics if available
+	let description: string | undefined;
+	if (common.lyrics && common.lyrics.length > 0) {
+		// Strip HTML tags from lyrics/description
+		description = common.lyrics[0].text
+			?.replace(/<[^>]*>/g, ' ')
+			.replace(/\s+/g, ' ')
+			.trim();
+	}
+
+	return {
+		title: common.title,
+		album: common.album,
+		artist: common.artist,
+		year: common.year,
+		genre: common.genre,
+		description,
+		duration: metadata.format.duration,
+	};
+}
+
 // --- Deepgram Transcription ---
-async function transcribe_audio(audio_path: string): Promise<unknown> {
+async function transcribe_audio(
+	audio_path: string,
+): Promise<unknown> {
 	if (!DEEPGRAM_API_KEY) throw new Error('DEEPGRAM_API_KEY not set');
 
 	const audio_buffer = readFileSync(audio_path);
-	const content_type = audio_path.endsWith('.mp3') ? 'audio/mpeg' : 'audio/wav';
+	const content_type = audio_path.endsWith('.mp3')
+		? 'audio/mpeg'
+		: 'audio/wav';
 
 	const response = await fetch(
 		'https://api.deepgram.com/v1/listen?model=nova-3&smart_format=true&paragraphs=true&utterances=true',
@@ -64,18 +110,21 @@ async function transcribe_audio(audio_path: string): Promise<unknown> {
 async function embed_texts(texts: string[]): Promise<number[][]> {
 	if (!VOYAGE_API_KEY) throw new Error('VOYAGE_API_KEY not set');
 
-	const response = await fetch('https://api.voyageai.com/v1/embeddings', {
-		method: 'POST',
-		headers: {
-			Authorization: `Bearer ${VOYAGE_API_KEY}`,
-			'Content-Type': 'application/json',
+	const response = await fetch(
+		'https://api.voyageai.com/v1/embeddings',
+		{
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${VOYAGE_API_KEY}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				input: texts,
+				model: 'voyage-3.5-lite',
+				input_type: 'document',
+			}),
 		},
-		body: JSON.stringify({
-			input: texts,
-			model: 'voyage-3.5-lite',
-			input_type: 'document',
-		}),
-	});
+	);
 
 	if (!response.ok) {
 		const error = await response.text();
@@ -89,18 +138,21 @@ async function embed_texts(texts: string[]): Promise<number[][]> {
 async function embed_query_text(text: string): Promise<number[]> {
 	if (!VOYAGE_API_KEY) throw new Error('VOYAGE_API_KEY not set');
 
-	const response = await fetch('https://api.voyageai.com/v1/embeddings', {
-		method: 'POST',
-		headers: {
-			Authorization: `Bearer ${VOYAGE_API_KEY}`,
-			'Content-Type': 'application/json',
+	const response = await fetch(
+		'https://api.voyageai.com/v1/embeddings',
+		{
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${VOYAGE_API_KEY}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				input: text,
+				model: 'voyage-3.5-lite',
+				input_type: 'query',
+			}),
 		},
-		body: JSON.stringify({
-			input: text,
-			model: 'voyage-3.5-lite',
-			input_type: 'query',
-		}),
-	});
+	);
 
 	if (!response.ok) {
 		const error = await response.text();
@@ -118,15 +170,25 @@ function parse_transcript(deepgram_response: unknown): Segment[] {
 			channels?: Array<{
 				alternatives?: Array<{
 					paragraphs?: {
-						paragraphs?: Array<{ sentences?: Array<{ text: string }>; start?: number; end?: number }>;
+						paragraphs?: Array<{
+							sentences?: Array<{ text: string }>;
+							start?: number;
+							end?: number;
+						}>;
 					};
 				}>;
 			}>;
-			utterances?: Array<{ transcript: string; start: number; end: number }>;
+			utterances?: Array<{
+				transcript: string;
+				start: number;
+				end: number;
+			}>;
 		};
 	};
 
-	const paragraphs = response?.results?.channels?.[0]?.alternatives?.[0]?.paragraphs?.paragraphs;
+	const paragraphs =
+		response?.results?.channels?.[0]?.alternatives?.[0]?.paragraphs
+			?.paragraphs;
 
 	if (!paragraphs) {
 		const utterances = response?.results?.utterances;
@@ -158,7 +220,11 @@ const init = defineCommand({
 		const schema = readFileSync(SCHEMA_PATH, 'utf-8');
 		db.exec(schema);
 		db.close();
-		output({ ok: true, message: 'Database initialized', path: DB_PATH });
+		output({
+			ok: true,
+			message: 'Database initialized',
+			path: DB_PATH,
+		});
 	},
 });
 
@@ -214,7 +280,9 @@ const embed = defineCommand({
 		},
 	},
 	async run({ args }) {
-		const transcript = JSON.parse(readFileSync(args.transcript, 'utf-8'));
+		const transcript = JSON.parse(
+			readFileSync(args.transcript, 'utf-8'),
+		);
 		const segments = parse_transcript(transcript);
 		const texts = segments.map((s) => s.text);
 
@@ -230,7 +298,10 @@ const embed = defineCommand({
 		const output_data = { segments, embeddings: all_embeddings };
 
 		if (args.output) {
-			writeFileSync(args.output, JSON.stringify(output_data, null, 2));
+			writeFileSync(
+				args.output,
+				JSON.stringify(output_data, null, 2),
+			);
 		}
 
 		output({
@@ -270,15 +341,21 @@ const ingest = defineCommand({
 		const data = JSON.parse(readFileSync(args.embeddings, 'utf-8'));
 		const db = get_db();
 
-		let podcast = db.prepare('SELECT id FROM podcasts WHERE name = ?').get(args.podcast) as { id: number } | undefined;
+		let podcast = db
+			.prepare('SELECT id FROM podcasts WHERE name = ?')
+			.get(args.podcast) as { id: number } | undefined;
 
 		if (!podcast) {
-			const result = db.prepare('INSERT INTO podcasts (name) VALUES (?)').run(args.podcast);
+			const result = db
+				.prepare('INSERT INTO podcasts (name) VALUES (?)')
+				.run(args.podcast);
 			podcast = { id: Number(result.lastInsertRowid) };
 		}
 
 		const episode_result = db
-			.prepare('INSERT INTO episodes (podcast_id, title) VALUES (?, ?)')
+			.prepare(
+				'INSERT INTO episodes (podcast_id, title) VALUES (?, ?)',
+			)
 			.run(podcast.id, args.episode);
 		const episode_id = Number(episode_result.lastInsertRowid);
 
@@ -289,13 +366,17 @@ const ingest = defineCommand({
 		const transaction = db.transaction(() => {
 			for (let i = 0; i < data.segments.length; i++) {
 				const seg = data.segments[i];
-				const result = insert_segment.run(episode_id, seg.text, seg.start, seg.end);
+				const result = insert_segment.run(
+					episode_id,
+					seg.text,
+					seg.start,
+					seg.end,
+				);
 				const segment_id = Number(result.lastInsertRowid);
 				const embedding_json = JSON.stringify(data.embeddings[i]);
-				db.prepare(`INSERT INTO segments_vec (rowid, embedding) VALUES (CAST(? AS INTEGER), vec_f32(?))`).run(
-					segment_id,
-					embedding_json,
-				);
+				db.prepare(
+					`INSERT INTO segments_vec (rowid, embedding) VALUES (CAST(? AS INTEGER), vec_f32(?))`,
+				).run(segment_id, embedding_json);
 			}
 		});
 
@@ -311,10 +392,29 @@ const ingest = defineCommand({
 	},
 });
 
+const inspect = defineCommand({
+	meta: {
+		name: 'inspect',
+		description: 'Inspect audio file metadata (ID3 tags)',
+	},
+	args: {
+		audio: {
+			type: 'positional',
+			description: 'Path to the audio file',
+			required: true,
+		},
+	},
+	async run({ args }) {
+		const metadata = await get_audio_metadata(args.audio);
+		output({ ok: true, metadata });
+	},
+});
+
 const process_cmd = defineCommand({
 	meta: {
 		name: 'process',
-		description: 'Full pipeline: transcribe, embed, and ingest an audio file',
+		description:
+			'Full pipeline: transcribe, embed, and ingest an audio file',
 	},
 	args: {
 		audio: {
@@ -325,17 +425,33 @@ const process_cmd = defineCommand({
 		podcast: {
 			type: 'string',
 			alias: 'p',
-			description: 'Podcast name',
-			required: true,
+			description:
+				'Podcast name (auto-detected from ID3 album if not provided)',
 		},
 		episode: {
 			type: 'string',
 			alias: 'e',
-			description: 'Episode title',
-			required: true,
+			description:
+				'Episode title (auto-detected from ID3 title if not provided)',
 		},
 	},
 	async run({ args }) {
+		// 0. Get metadata from audio file
+		const metadata = await get_audio_metadata(args.audio);
+		const podcast_name = args.podcast || metadata.album;
+		const episode_title = args.episode || metadata.title;
+
+		if (!podcast_name) {
+			throw new Error(
+				'Could not detect podcast name from metadata. Please provide --podcast',
+			);
+		}
+		if (!episode_title) {
+			throw new Error(
+				'Could not detect episode title from metadata. Please provide --episode',
+			);
+		}
+
 		// 1. Transcribe
 		const transcript = await transcribe_audio(args.audio);
 		const segments = parse_transcript(transcript);
@@ -354,16 +470,22 @@ const process_cmd = defineCommand({
 		// 3. Ingest
 		const db = get_db();
 
-		let podcast = db.prepare('SELECT id FROM podcasts WHERE name = ?').get(args.podcast) as { id: number } | undefined;
+		let podcast = db
+			.prepare('SELECT id FROM podcasts WHERE name = ?')
+			.get(podcast_name) as { id: number } | undefined;
 
 		if (!podcast) {
-			const result = db.prepare('INSERT INTO podcasts (name) VALUES (?)').run(args.podcast);
+			const result = db
+				.prepare('INSERT INTO podcasts (name) VALUES (?)')
+				.run(podcast_name);
 			podcast = { id: Number(result.lastInsertRowid) };
 		}
 
 		const episode_result = db
-			.prepare('INSERT INTO episodes (podcast_id, title) VALUES (?, ?)')
-			.run(podcast.id, args.episode);
+			.prepare(
+				'INSERT INTO episodes (podcast_id, title) VALUES (?, ?)',
+			)
+			.run(podcast.id, episode_title);
 		const episode_id = Number(episode_result.lastInsertRowid);
 
 		const insert_segment = db.prepare(
@@ -373,13 +495,17 @@ const process_cmd = defineCommand({
 		const transaction = db.transaction(() => {
 			for (let i = 0; i < segments.length; i++) {
 				const seg = segments[i];
-				const result = insert_segment.run(episode_id, seg.text, seg.start, seg.end);
+				const result = insert_segment.run(
+					episode_id,
+					seg.text,
+					seg.start,
+					seg.end,
+				);
 				const segment_id = Number(result.lastInsertRowid);
 				const embedding_json = JSON.stringify(all_embeddings[i]);
-				db.prepare(`INSERT INTO segments_vec (rowid, embedding) VALUES (CAST(? AS INTEGER), vec_f32(?))`).run(
-					segment_id,
-					embedding_json,
-				);
+				db.prepare(
+					`INSERT INTO segments_vec (rowid, embedding) VALUES (CAST(? AS INTEGER), vec_f32(?))`,
+				).run(segment_id, embedding_json);
 			}
 		});
 
@@ -388,8 +514,9 @@ const process_cmd = defineCommand({
 
 		output({
 			ok: true,
-			podcast: { id: podcast.id, name: args.podcast },
-			episode: { id: episode_id, title: args.episode },
+			podcast: { id: podcast.id, name: podcast_name },
+			episode: { id: episode_id, title: episode_title },
+			metadata_used: !args.podcast || !args.episode,
 			segments: segments.length,
 			embeddings: all_embeddings.length,
 		});
@@ -426,9 +553,9 @@ const search = defineCommand({
 
 		let podcast_ids: number[] | undefined;
 		if (args.podcast) {
-			const podcast = db.prepare('SELECT id FROM podcasts WHERE name LIKE ?').get(`%${args.podcast}%`) as
-				| { id: number }
-				| undefined;
+			const podcast = db
+				.prepare('SELECT id FROM podcasts WHERE name LIKE ?')
+				.get(`%${args.podcast}%`) as { id: number } | undefined;
 			if (podcast) podcast_ids = [podcast.id];
 		}
 
@@ -507,21 +634,84 @@ const list = defineCommand({
 	},
 });
 
+const update = defineCommand({
+	meta: {
+		name: 'update',
+		description: 'Update podcast or episode metadata',
+	},
+	args: {
+		podcast: {
+			type: 'string',
+			alias: 'p',
+			description: 'Podcast ID to update',
+		},
+		episode: {
+			type: 'string',
+			alias: 'e',
+			description: 'Episode ID to update',
+		},
+		name: {
+			type: 'string',
+			alias: 'n',
+			description: 'New name/title',
+		},
+	},
+	run({ args }) {
+		if (!args.name) {
+			throw new Error('--name is required');
+		}
+
+		const db = get_db();
+
+		if (args.podcast) {
+			db.prepare('UPDATE podcasts SET name = ? WHERE id = ?').run(
+				args.name,
+				parseInt(args.podcast),
+			);
+			db.close();
+			output({
+				ok: true,
+				updated: 'podcast',
+				id: parseInt(args.podcast),
+				name: args.name,
+			});
+		} else if (args.episode) {
+			db.prepare('UPDATE episodes SET title = ? WHERE id = ?').run(
+				args.name,
+				parseInt(args.episode),
+			);
+			db.close();
+			output({
+				ok: true,
+				updated: 'episode',
+				id: parseInt(args.episode),
+				title: args.name,
+			});
+		} else {
+			db.close();
+			throw new Error('Either --podcast or --episode is required');
+		}
+	},
+});
+
 // --- Main ---
 const main = defineCommand({
 	meta: {
 		name: 'audiomind',
-		description: 'CLI for managing podcast transcriptions and semantic search',
+		description:
+			'CLI for managing podcast transcriptions and semantic search',
 		version: '0.0.1',
 	},
 	subCommands: {
 		init,
+		inspect,
 		transcribe,
 		embed,
 		ingest,
 		process: process_cmd,
 		search,
 		list,
+		update,
 	},
 });
 
