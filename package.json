@@ -3,7 +3,11 @@
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"bin": {
+		"audiomind": "./src/cli/index.ts"
+	},
 	"scripts": {
+		"cli": "node --experimental-strip-types --env-file=.env ./src/cli/index.ts",
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
@@ -58,6 +62,7 @@
 		"@deepgram/sdk": "^4.11.3",
 		"ai": "^5.0.115",
 		"better-sqlite3": "^12.5.0",
+		"citty": "^0.1.6",
 		"date-fns": "^4.1.0",
 		"mode-watcher": "^1.1.0",
 		"runed": "^0.37.0",
