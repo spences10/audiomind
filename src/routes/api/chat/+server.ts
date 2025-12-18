@@ -142,7 +142,7 @@ ${context}`;
 	);
 
 	const result = streamText({
-		model: anthropic('claude-haiku-4-5-20250514'),
+		model: anthropic('claude-haiku-4-5-20251001'),
 		system: system_prompt,
 		messages: core_messages,
 	});
