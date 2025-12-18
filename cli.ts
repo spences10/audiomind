@@ -20,7 +20,10 @@ function get_db(): Database.Database {
 
 function init_db() {
 	const db = get_db();
-	const schema = readFileSync(resolve(import.meta.dirname, 'src/lib/server/schema.sql'), 'utf-8');
+	const schema = readFileSync(
+		resolve(import.meta.dirname, 'src/lib/server/schema.sql'),
+		'utf-8',
+	);
 	db.exec(schema);
 	db.close();
 	console.log('Database initialized');
@@ -31,9 +34,13 @@ async function transcribe(audio_path: string): Promise<any> {
 	if (!DEEPGRAM_API_KEY) throw new Error('DEEPGRAM_API_KEY not set');
 
 	const audio_buffer = readFileSync(audio_path);
-	const content_type = audio_path.endsWith('.mp3') ? 'audio/mpeg' : 'audio/wav';
+	const content_type = audio_path.endsWith('.mp3')
+		? 'audio/mpeg'
+		: 'audio/wav';
 
-	console.log(`Transcribing ${audio_path} (${(audio_buffer.length / 1024 / 1024).toFixed(2)} MB)...`);
+	console.log(
+		`Transcribing ${audio_path} (${(audio_buffer.length / 1024 / 1024).toFixed(2)} MB)...`,
+	);
 
 	const response = await fetch(
 		'https://api.deepgram.com/v1/listen?model=nova-3&smart_format=true&paragraphs=true&utterances=true',
@@ -41,10 +48,10 @@ async function transcribe(audio_path: string): Promise<any> {
 			method: 'POST',
 			headers: {
 				Authorization: `Token ${DEEPGRAM_API_KEY}`,
-				'Content-Type': content_type
+				'Content-Type': content_type,
 			},
-			body: audio_buffer
-		}
+			body: audio_buffer,
+		},
 	);
 
 	if (!response.ok) {
@@ -59,20 +66,25 @@ async function transcribe(audio_path: string): Promise<any> {
 async function embed(texts: string[]): Promise<number[][]> {
 	if (!VOYAGE_API_KEY) throw new Error('VOYAGE_API_KEY not set');
 
-	console.log(`Generating embeddings for ${texts.length} segments...`);
+	console.log(
+		`Generating embeddings for ${texts.length} segments...`,
+	);
 
-	const response = await fetch('https://api.voyageai.com/v1/embeddings', {
-		method: 'POST',
-		headers: {
-			Authorization: `Bearer ${VOYAGE_API_KEY}`,
-			'Content-Type': 'application/json'
+	const response = await fetch(
+		'https://api.voyageai.com/v1/embeddings',
+		{
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${VOYAGE_API_KEY}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				input: texts,
+				model: 'voyage-3.5-lite',
+				input_type: 'document',
+			}),
 		},
-		body: JSON.stringify({
-			input: texts,
-			model: 'voyage-3.5-lite',
-			input_type: 'document'
-		})
-	});
+	);
 
 	if (!response.ok) {
 		const error = await response.text();
@@ -86,18 +98,21 @@ async function embed(texts: string[]): Promise<number[][]> {
 async function embed_query(text: string): Promise<number[]> {
 	if (!VOYAGE_API_KEY) throw new Error('VOYAGE_API_KEY not set');
 
-	const response = await fetch('https://api.voyageai.com/v1/embeddings', {
-		method: 'POST',
-		headers: {
-			Authorization: `Bearer ${VOYAGE_API_KEY}`,
-			'Content-Type': 'application/json'
+	const response = await fetch(
+		'https://api.voyageai.com/v1/embeddings',
+		{
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${VOYAGE_API_KEY}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				input: text,
+				model: 'voyage-3.5-lite',
+				input_type: 'query',
+			}),
 		},
-		body: JSON.stringify({
-			input: text,
-			model: 'voyage-3.5-lite',
-			input_type: 'query'
-		})
-	});
+	);
 
 	if (!response.ok) {
 		const error = await response.text();
@@ -117,7 +132,8 @@ interface Segment {
 
 function parse_transcript(deepgram_response: any): Segment[] {
 	const paragraphs =
-		deepgram_response?.results?.channels?.[0]?.alternatives?.[0]?.paragraphs?.paragraphs;
+		deepgram_response?.results?.channels?.[0]?.alternatives?.[0]
+			?.paragraphs?.paragraphs;
 
 	if (!paragraphs) {
 		// Fallback to utterances
@@ -126,7 +142,7 @@ function parse_transcript(deepgram_response: any): Segment[] {
 			return utterances.map((u: any) => ({
 				text: u.transcript,
 				start: u.start,
-				end: u.end
+				end: u.end,
 			}));
 		}
 		throw new Error('No paragraphs or utterances in transcript');
@@ -135,7 +151,7 @@ function parse_transcript(deepgram_response: any): Segment[] {
 	return paragraphs.map((p: any) => ({
 		text: p.sentences?.map((s: any) => s.text).join(' ') || '',
 		start: p.start || 0,
-		end: p.end || 0
+		end: p.end || 0,
 	}));
 }
 
@@ -145,15 +161,17 @@ function ingest(
 	podcast_name: string,
 	episode_title: string,
 	segments: Segment[],
-	embeddings: number[][]
+	embeddings: number[][],
 ) {
 	// Get or create podcast
-	let podcast = db.prepare('SELECT id FROM podcasts WHERE name = ?').get(podcast_name) as
-		| { id: number }
-		| undefined;
+	let podcast = db
+		.prepare('SELECT id FROM podcasts WHERE name = ?')
+		.get(podcast_name) as { id: number } | undefined;
 
 	if (!podcast) {
-		const result = db.prepare('INSERT INTO podcasts (name) VALUES (?)').run(podcast_name);
+		const result = db
+			.prepare('INSERT INTO podcasts (name) VALUES (?)')
+			.run(podcast_name);
 		podcast = { id: Number(result.lastInsertRowid) };
 		console.log(`Created podcast: ${podcast_name}`);
 	}
@@ -167,21 +185,25 @@ function ingest(
 
 	// Insert segments and embeddings
 	const insert_segment = db.prepare(
-		'INSERT INTO segments (episode_id, text, start_time, end_time) VALUES (?, ?, ?, ?)'
+		'INSERT INTO segments (episode_id, text, start_time, end_time) VALUES (?, ?, ?, ?)',
 	);
 
 	const transaction = db.transaction(() => {
 		for (let i = 0; i < segments.length; i++) {
 			const seg = segments[i];
-			const result = insert_segment.run(episode_id, seg.text, seg.start, seg.end);
+			const result = insert_segment.run(
+				episode_id,
+				seg.text,
+				seg.start,
+				seg.end,
+			);
 			const segment_id = Number(result.lastInsertRowid);
 			const embedding_json = JSON.stringify(embeddings[i]);
 
 			// sqlite-vec expects CAST for bound rowid and vec_f32() for JSON input
-			db.prepare(`INSERT INTO segments_vec (rowid, embedding) VALUES (CAST(? AS INTEGER), vec_f32(?))`).run(
-				segment_id,
-				embedding_json
-			);
+			db.prepare(
+				`INSERT INTO segments_vec (rowid, embedding) VALUES (CAST(? AS INTEGER), vec_f32(?))`,
+			).run(segment_id, embedding_json);
 		}
 	});
 
@@ -190,7 +212,12 @@ function ingest(
 }
 
 // --- Search ---
-function search(db: Database.Database, query_embedding: number[], limit = 10, podcast_ids?: number[]) {
+function search(
+	db: Database.Database,
+	query_embedding: number[],
+	limit = 10,
+	podcast_ids?: number[],
+) {
 	const query_vec = JSON.stringify(query_embedding);
 
 	// sqlite-vec requires k = ? for KNN queries
@@ -229,19 +256,23 @@ const commands: Record<string, () => Promise<void>> = {
 		const { positionals, values } = parseArgs({
 			args: process.argv.slice(3),
 			options: {
-				output: { type: 'string', short: 'o' }
+				output: { type: 'string', short: 'o' },
 			},
-			allowPositionals: true
+			allowPositionals: true,
 		});
 
 		const audio_path = positionals[0];
 		if (!audio_path) {
-			console.error('Usage: cli transcribe <audio-file> [-o output.json]');
+			console.error(
+				'Usage: cli transcribe <audio-file> [-o output.json]',
+			);
 			process.exit(1);
 		}
 
 		const result = await transcribe(audio_path);
-		const output_path = values.output || audio_path.replace(/\.[^.]+$/, '.transcript.json');
+		const output_path =
+			values.output ||
+			audio_path.replace(/\.[^.]+$/, '.transcript.json');
 
 		writeFileSync(output_path, JSON.stringify(result, null, 2));
 		console.log(`Transcript saved to ${output_path}`);
@@ -254,18 +285,22 @@ const commands: Record<string, () => Promise<void>> = {
 		const { positionals, values } = parseArgs({
 			args: process.argv.slice(3),
 			options: {
-				output: { type: 'string', short: 'o' }
+				output: { type: 'string', short: 'o' },
 			},
-			allowPositionals: true
+			allowPositionals: true,
 		});
 
 		const transcript_path = positionals[0];
 		if (!transcript_path) {
-			console.error('Usage: cli embed <transcript.json> [-o embeddings.json]');
+			console.error(
+				'Usage: cli embed <transcript.json> [-o embeddings.json]',
+			);
 			process.exit(1);
 		}
 
-		const transcript = JSON.parse(readFileSync(transcript_path, 'utf-8'));
+		const transcript = JSON.parse(
+			readFileSync(transcript_path, 'utf-8'),
+		);
 		const segments = parse_transcript(transcript);
 		const texts = segments.map((s) => s.text);
 
@@ -277,11 +312,22 @@ const commands: Record<string, () => Promise<void>> = {
 			const batch = texts.slice(i, i + batch_size);
 			const embeddings = await embed(batch);
 			all_embeddings.push(...embeddings);
-			console.log(`Embedded ${Math.min(i + batch_size, texts.length)}/${texts.length}`);
+			console.log(
+				`Embedded ${Math.min(i + batch_size, texts.length)}/${texts.length}`,
+			);
 		}
 
-		const output_path = values.output || transcript_path.replace('.transcript.json', '.embeddings.json');
-		writeFileSync(output_path, JSON.stringify({ segments, embeddings: all_embeddings }, null, 2));
+		const output_path =
+			values.output ||
+			transcript_path.replace('.transcript.json', '.embeddings.json');
+		writeFileSync(
+			output_path,
+			JSON.stringify(
+				{ segments, embeddings: all_embeddings },
+				null,
+				2,
+			),
+		);
 		console.log(`Embeddings saved to ${output_path}`);
 	},
 
@@ -290,21 +336,29 @@ const commands: Record<string, () => Promise<void>> = {
 			args: process.argv.slice(3),
 			options: {
 				podcast: { type: 'string', short: 'p' },
-				episode: { type: 'string', short: 'e' }
+				episode: { type: 'string', short: 'e' },
 			},
-			allowPositionals: true
+			allowPositionals: true,
 		});
 
 		const embeddings_path = positionals[0];
 		if (!embeddings_path || !values.podcast || !values.episode) {
-			console.error('Usage: cli ingest <embeddings.json> -p "Podcast Name" -e "Episode Title"');
+			console.error(
+				'Usage: cli ingest <embeddings.json> -p "Podcast Name" -e "Episode Title"',
+			);
 			process.exit(1);
 		}
 
 		const data = JSON.parse(readFileSync(embeddings_path, 'utf-8'));
 		const db = get_db();
 
-		ingest(db, values.podcast, values.episode, data.segments, data.embeddings);
+		ingest(
+			db,
+			values.podcast,
+			values.episode,
+			data.segments,
+			data.embeddings,
+		);
 		db.close();
 	},
 
@@ -313,14 +367,16 @@ const commands: Record<string, () => Promise<void>> = {
 			args: process.argv.slice(3),
 			options: {
 				podcast: { type: 'string', short: 'p' },
-				episode: { type: 'string', short: 'e' }
+				episode: { type: 'string', short: 'e' },
 			},
-			allowPositionals: true
+			allowPositionals: true,
 		});
 
 		const audio_path = positionals[0];
 		if (!audio_path || !values.podcast || !values.episode) {
-			console.error('Usage: cli process <audio-file> -p "Podcast Name" -e "Episode Title"');
+			console.error(
+				'Usage: cli process <audio-file> -p "Podcast Name" -e "Episode Title"',
+			);
 			process.exit(1);
 		}
 
@@ -340,13 +396,21 @@ const commands: Record<string, () => Promise<void>> = {
 			const batch = texts.slice(i, i + batch_size);
 			const embeddings = await embed(batch);
 			all_embeddings.push(...embeddings);
-			console.log(`Embedded ${Math.min(i + batch_size, texts.length)}/${texts.length}`);
+			console.log(
+				`Embedded ${Math.min(i + batch_size, texts.length)}/${texts.length}`,
+			);
 		}
 
 		// 3. Ingest
 		console.log('\n--- Step 3: Ingest ---');
 		const db = get_db();
-		ingest(db, values.podcast, values.episode, segments, all_embeddings);
+		ingest(
+			db,
+			values.podcast,
+			values.episode,
+			segments,
+			all_embeddings,
+		);
 		db.close();
 
 		console.log('\nDone!');
@@ -357,14 +421,16 @@ const commands: Record<string, () => Promise<void>> = {
 			args: process.argv.slice(3),
 			options: {
 				limit: { type: 'string', short: 'n' },
-				podcast: { type: 'string', short: 'p' }
+				podcast: { type: 'string', short: 'p' },
 			},
-			allowPositionals: true
+			allowPositionals: true,
 		});
 
 		const query = positionals.join(' ');
 		if (!query) {
-			console.error('Usage: cli search "your query" [-n limit] [-p podcast]');
+			console.error(
+				'Usage: cli search "your query" [-n limit] [-p podcast]',
+			);
 			process.exit(1);
 		}
 
@@ -373,19 +439,28 @@ const commands: Record<string, () => Promise<void>> = {
 
 		let podcast_ids: number[] | undefined;
 		if (values.podcast) {
-			const podcast = db.prepare('SELECT id FROM podcasts WHERE name LIKE ?').get(`%${values.podcast}%`) as
-				| { id: number }
-				| undefined;
+			const podcast = db
+				.prepare('SELECT id FROM podcasts WHERE name LIKE ?')
+				.get(`%${values.podcast}%`) as { id: number } | undefined;
 			if (podcast) podcast_ids = [podcast.id];
 		}
 
-		const results = search(db, query_embedding, parseInt(values.limit || '10'), podcast_ids);
+		const results = search(
+			db,
+			query_embedding,
+			parseInt(values.limit || '10'),
+			podcast_ids,
+		);
 
 		console.log(`\nResults for: "${query}"\n`);
 		for (const r of results as any[]) {
 			console.log(`[${r.podcast_name}] ${r.episode_title}`);
-			console.log(`  Distance: ${r.distance.toFixed(4)} | Time: ${r.start_time.toFixed(1)}s - ${r.end_time.toFixed(1)}s`);
-			console.log(`  ${r.text.slice(0, 200)}${r.text.length > 200 ? '...' : ''}\n`);
+			console.log(
+				`  Distance: ${r.distance.toFixed(4)} | Time: ${r.start_time.toFixed(1)}s - ${r.end_time.toFixed(1)}s`,
+			);
+			console.log(
+				`  ${r.text.slice(0, 200)}${r.text.length > 200 ? '...' : ''}\n`,
+			);
 		}
 
 		db.close();
@@ -394,10 +469,16 @@ const commands: Record<string, () => Promise<void>> = {
 	async list() {
 		const db = get_db();
 
-		const podcasts = db.prepare('SELECT * FROM podcasts').all() as any[];
+		const podcasts = db
+			.prepare('SELECT * FROM podcasts')
+			.all() as any[];
 		console.log('\nPodcasts:');
 		for (const p of podcasts) {
-			const count = db.prepare('SELECT COUNT(*) as c FROM episodes WHERE podcast_id = ?').get(p.id) as { c: number };
+			const count = db
+				.prepare(
+					'SELECT COUNT(*) as c FROM episodes WHERE podcast_id = ?',
+				)
+				.get(p.id) as { c: number };
 			console.log(`  [${p.id}] ${p.name} (${count.c} episodes)`);
 		}
 
@@ -408,17 +489,19 @@ const commands: Record<string, () => Promise<void>> = {
              (SELECT COUNT(*) FROM segments WHERE episode_id = e.id) as segment_count
       FROM episodes e
       JOIN podcasts p ON e.podcast_id = p.id
-    `
+    `,
 			)
 			.all() as any[];
 
 		console.log('\nEpisodes:');
 		for (const e of episodes) {
-			console.log(`  [${e.id}] ${e.podcast_name} - ${e.title} (${e.segment_count} segments)`);
+			console.log(
+				`  [${e.id}] ${e.podcast_name} - ${e.title} (${e.segment_count} segments)`,
+			);
 		}
 
 		db.close();
-	}
+	},
 };
 
 // --- Main ---

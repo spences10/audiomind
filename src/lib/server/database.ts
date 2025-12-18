@@ -11,14 +11,16 @@ const DB_PATH = join(__dirname, '../../../data/audiomind.db');
 
 let db: Database.Database | null = null;
 
-export function getDb(): Database.Database {
+export function get_db(): Database.Database {
 	if (!db) {
-		throw new Error('Database not initialized. Call initDatabase() first.');
+		throw new Error(
+			'Database not initialized. Call init_database() first.',
+		);
 	}
 	return db;
 }
 
-export function initDatabase(): void {
+export function init_database(): void {
 	if (db) return;
 
 	db = new Database(DB_PATH);
