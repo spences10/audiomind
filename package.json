@@ -58,9 +58,12 @@
 		"@deepgram/sdk": "^4.11.3",
 		"ai": "^5.0.115",
 		"better-sqlite3": "^12.5.0",
+		"date-fns": "^4.1.0",
 		"mode-watcher": "^1.1.0",
 		"runed": "^0.37.0",
 		"sqlite-vec": "0.1.7-alpha.2",
+		"svelte-exmarkdown": "^5.0.2",
+		"svelte-sonner": "^1.0.7",
 		"svelte-streamdown": "^3.0.1"
 	}
 }
