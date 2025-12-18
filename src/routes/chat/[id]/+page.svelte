@@ -1,41 +1,26 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import Markdown from '$lib/components/chat/markdown.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { ChatHistory } from '$lib/state/chat-history.svelte';
 	import { Chat } from '@ai-sdk/svelte';
 	import { ArrowUp, Sparkles } from '@lucide/svelte';
 	import { fly } from 'svelte/transition';
+	import type { PageData } from './$types';
 
-	const chat_history = ChatHistory.fromContext();
+	let { data }: { data: PageData } = $props();
 
-	const chat = new Chat({
+	const chat = $derived.by(() => new Chat({
+		id: data.chat.id,
+		messages: data.chat.messages,
 		onFinish: async () => {
-			// Save chat after first exchange
-			if (chat.messages.length >= 2) {
-				const id = crypto.randomUUID();
-				const firstUserMsg = chat.messages.find(
-					(m) => m.role === 'user',
-				);
-				const title =
-					get_message_text(firstUserMsg!).slice(0, 50) || 'New chat';
-
-				await fetch('/api/chats', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						id,
-						title,
-						messages: chat.messages,
-					}),
-				});
-
-				chat_history.refetch();
-				goto(`/chat/${id}`, { replaceState: true });
-			}
+			// Save updated messages to DB
+			await fetch(`/api/chats/${data.chat.id}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ messages: chat.messages }),
+			});
 		},
-	});
+	}));
 
 	let input_value = $state('');
 	let container_ref = $state<HTMLElement | null>(null);
@@ -103,7 +88,7 @@
 
 <div class="flex h-screen flex-col bg-background">
 	<header class="border-b p-4">
-		<h1 class="text-xl font-semibold">New Chat</h1>
+		<h1 class="text-xl font-semibold">{data.chat.title}</h1>
 		<p class="text-sm text-muted-foreground">
 			Ask questions about your podcasts
 		</p>
@@ -115,60 +100,47 @@
 		class="flex-1 overflow-y-auto p-4"
 	>
 		<div class="mx-auto max-w-3xl space-y-6">
-			{#if chat.messages.length === 0}
+			{#each chat.messages as message (message.id)}
 				<div
-					class="flex h-full items-center justify-center text-center text-muted-foreground"
+					in:fly={{ y: 10, duration: 200 }}
+					class="flex gap-3 {message.role === 'user'
+						? 'justify-end'
+						: ''}"
 				>
-					<div>
-						<p class="text-lg font-medium">No messages yet</p>
-						<p class="text-sm">
-							Ask a question about your podcasts to get started
-						</p>
-					</div>
-				</div>
-			{:else}
-				{#each chat.messages as message (message.id)}
-					<div
-						in:fly={{ y: 10, duration: 200 }}
-						class="flex gap-3 {message.role === 'user'
-							? 'justify-end'
-							: ''}"
-					>
-						{#if message.role === 'assistant'}
-							<div
-								class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted ring-1 ring-border"
-							>
-								<Sparkles class="h-4 w-4" />
-							</div>
-						{/if}
-						<div
-							class="max-w-[80%] rounded-2xl px-4 py-2 {message.role ===
-							'user'
-								? 'bg-primary text-primary-foreground'
-								: 'bg-muted'}"
-						>
-							{#if message.role === 'assistant'}
-								<Markdown content={get_message_text(message)} />
-							{:else}
-								<p class="whitespace-pre-wrap">
-									{get_message_text(message)}
-								</p>
-							{/if}
-						</div>
-					</div>
-				{/each}
-				{#if loading && chat.messages.length > 0 && chat.messages[chat.messages.length - 1].role === 'user'}
-					<div in:fly={{ y: 10, duration: 200 }} class="flex gap-3">
+					{#if message.role === 'assistant'}
 						<div
 							class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted ring-1 ring-border"
 						>
 							<Sparkles class="h-4 w-4" />
 						</div>
-						<div class="text-muted-foreground">
-							<span class="animate-pulse">Thinking...</span>
-						</div>
+					{/if}
+					<div
+						class="max-w-[80%] rounded-2xl px-4 py-2 {message.role ===
+						'user'
+							? 'bg-primary text-primary-foreground'
+							: 'bg-muted'}"
+					>
+						{#if message.role === 'assistant'}
+							<Markdown content={get_message_text(message)} />
+						{:else}
+							<p class="whitespace-pre-wrap">
+								{get_message_text(message)}
+							</p>
+						{/if}
 					</div>
-				{/if}
+				</div>
+			{/each}
+			{#if loading && chat.messages.length > 0 && chat.messages[chat.messages.length - 1].role === 'user'}
+				<div in:fly={{ y: 10, duration: 200 }} class="flex gap-3">
+					<div
+						class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted ring-1 ring-border"
+					>
+						<Sparkles class="h-4 w-4" />
+					</div>
+					<div class="text-muted-foreground">
+						<span class="animate-pulse">Thinking...</span>
+					</div>
+				</div>
 			{/if}
 			<div bind:this={end_ref} class="h-4"></div>
 		</div>

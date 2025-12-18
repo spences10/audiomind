@@ -30,3 +30,12 @@ CREATE TABLE IF NOT EXISTS segments (
 CREATE VIRTUAL TABLE IF NOT EXISTS segments_vec USING vec0(
   embedding FLOAT[1024]
 );
+
+-- Chat conversations
+CREATE TABLE IF NOT EXISTS chats (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  messages TEXT NOT NULL DEFAULT '[]',
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
