@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import Markdown from '$lib/components/chat/markdown.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import { SidebarTrigger } from '$lib/components/ui/sidebar';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { ChatHistory } from '$lib/state/chat-history.svelte';
 	import { Chat } from '@ai-sdk/svelte';
@@ -102,11 +103,14 @@
 </script>
 
 <div class="flex h-screen flex-col bg-background">
-	<header class="border-b p-4">
-		<h1 class="text-xl font-semibold">New Chat</h1>
-		<p class="text-sm text-muted-foreground">
-			Ask questions about your podcasts
-		</p>
+	<header class="flex items-center gap-2 border-b p-4">
+		<SidebarTrigger />
+		<div>
+			<h1 class="text-xl font-semibold">New Chat</h1>
+			<p class="text-sm text-muted-foreground">
+				Ask questions about your podcasts
+			</p>
+		</div>
 	</header>
 
 	<main

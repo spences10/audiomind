@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Markdown from '$lib/components/chat/markdown.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import { SidebarTrigger } from '$lib/components/ui/sidebar';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Chat } from '@ai-sdk/svelte';
 	import { ArrowUp, Sparkles } from '@lucide/svelte';
@@ -9,18 +10,21 @@
 
 	let { data }: { data: PageData } = $props();
 
-	const chat = $derived.by(() => new Chat({
-		id: data.chat.id,
-		messages: data.chat.messages,
-		onFinish: async () => {
-			// Save updated messages to DB
-			await fetch(`/api/chats/${data.chat.id}`, {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ messages: chat.messages }),
-			});
-		},
-	}));
+	const chat = $derived.by(
+		() =>
+			new Chat({
+				id: data.chat.id,
+				messages: data.chat.messages,
+				onFinish: async () => {
+					// Save updated messages to DB
+					await fetch(`/api/chats/${data.chat.id}`, {
+						method: 'PATCH',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ messages: chat.messages }),
+					});
+				},
+			}),
+	);
 
 	let input_value = $state('');
 	let container_ref = $state<HTMLElement | null>(null);
@@ -87,11 +91,14 @@
 </script>
 
 <div class="flex h-screen flex-col bg-background">
-	<header class="border-b p-4">
-		<h1 class="text-xl font-semibold">{data.chat.title}</h1>
-		<p class="text-sm text-muted-foreground">
-			Ask questions about your podcasts
-		</p>
+	<header class="flex items-center gap-2 border-b p-4">
+		<SidebarTrigger />
+		<div>
+			<h1 class="text-xl font-semibold">{data.chat.title}</h1>
+			<p class="text-sm text-muted-foreground">
+				Ask questions about your podcasts
+			</p>
+		</div>
 	</header>
 
 	<main
