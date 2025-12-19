@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { create_chat } from '$lib/chats.remote';
 	import Markdown from '$lib/components/chat/markdown.svelte';
 	import Sources from '$lib/components/chat/sources.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -23,17 +24,13 @@
 				const title =
 					get_message_text(firstUserMsg!).slice(0, 50) || 'New chat';
 
-				await fetch('/api/chats', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						id,
-						title,
-						messages: chat.messages,
-					}),
+				await create_chat({
+					id,
+					title,
+					messages: chat.messages,
 				});
 
-				chat_history.refetch();
+				await chat_history.refetch();
 				goto(`/chat/${id}`, { replaceState: true });
 			}
 		},

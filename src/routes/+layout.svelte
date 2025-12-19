@@ -25,7 +25,7 @@
 <ModeWatcher />
 <Toaster />
 
-<SidebarProvider>
+<SidebarProvider open={false}>
 	<AppSidebar />
 	<SidebarInset>
 		{@render children()}

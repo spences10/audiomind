@@ -1,46 +1,50 @@
+import {
+	delete_chat,
+	get_chats,
+	type ChatSummary,
+} from '$lib/chats.remote';
 import { getContext, setContext } from 'svelte';
 
-export interface ChatSummary {
-	id: string;
-	title: string;
-	created_at: string;
-	updated_at: string;
-}
+export type { ChatSummary };
 
 const CONTEXT_KEY = 'chat-history';
 
 export class ChatHistory {
+	// Store the query reference so we can call .refresh() on it
+	#query = get_chats();
 	chats = $state<ChatSummary[]>([]);
 	loading = $state(true);
 
 	async fetch() {
 		this.loading = true;
 		try {
-			const res = await fetch('/api/chats');
-			if (res.ok) {
-				this.chats = await res.json();
-			}
+			// Initial fetch - await the query
+			this.chats = await this.#query;
 		} finally {
 			this.loading = false;
 		}
 	}
 
 	async refetch() {
-		await this.fetch();
+		this.loading = true;
+		try {
+			// Call refresh() to bypass cache and get fresh data
+			await this.#query.refresh();
+			// After refresh, get the current value
+			this.chats = this.#query.current ?? [];
+		} finally {
+			this.loading = false;
+		}
 	}
 
 	async delete(id: string) {
-		const res = await fetch('/api/chats', {
-			method: 'DELETE',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ id }),
-		});
-
-		if (res.ok) {
+		try {
+			await delete_chat({ id });
 			this.chats = this.chats.filter((c) => c.id !== id);
+			return true;
+		} catch {
+			return false;
 		}
-
-		return res.ok;
 	}
 
 	static fromContext(): ChatHistory {

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { update_chat } from '$lib/chats.remote';
 	import Markdown from '$lib/components/chat/markdown.svelte';
 	import Sources from '$lib/components/chat/sources.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -18,10 +19,9 @@
 				messages: data.chat.messages,
 				onFinish: async () => {
 					// Save updated messages to DB
-					await fetch(`/api/chats/${data.chat.id}`, {
-						method: 'PATCH',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ messages: chat.messages }),
+					await update_chat({
+						id: data.chat.id,
+						messages: chat.messages,
 					});
 				},
 			}),
