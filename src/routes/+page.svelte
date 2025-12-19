@@ -1,191 +1,224 @@
 <script lang="ts">
-	import ChatForm from '$lib/components/chat/chat-form.svelte';
-	import ChatMessage from '$lib/components/chat/chat-message.svelte';
-	import SearchResults from '$lib/components/chat/search-results.svelte';
-	import { config } from '$lib/config/app-config';
-	import { chat } from '$lib/stores/chat.svelte';
-	import { handle_stream_response } from '$lib/utils/chat/stream-handler';
+	import { goto } from '$app/navigation';
+	import Markdown from '$lib/components/chat/markdown.svelte';
+	import Sources from '$lib/components/chat/sources.svelte';
+	import { Button } from '$lib/components/ui/button';
+	import { SidebarTrigger } from '$lib/components/ui/sidebar';
+	import { Textarea } from '$lib/components/ui/textarea';
+	import { ChatHistory } from '$lib/state/chat-history.svelte';
+	import { Chat } from '@ai-sdk/svelte';
+	import { ArrowUp, Sparkles } from '@lucide/svelte';
+	import { fly } from 'svelte/transition';
 
-	let search_query = $state('');
-	let event_source: EventSource | null = $state(null);
-	let has_messages = $derived(
-		chat.messages.length > 0 || chat.current_response,
-	);
-	let messages_container = $state<HTMLDivElement | null>(null);
+	const chat_history = ChatHistory.fromContext();
 
-	// Auto scroll to bottom when messages change or during streaming
-	$effect(() => {
-		if (!messages_container) return;
+	const chat = new Chat({
+		onFinish: async () => {
+			// Save chat after first exchange
+			if (chat.messages.length >= 2) {
+				const id = crypto.randomUUID();
+				const firstUserMsg = chat.messages.find(
+					(m) => m.role === 'user',
+				);
+				const title =
+					get_message_text(firstUserMsg!).slice(0, 50) || 'New chat';
 
-		// Always scroll on new messages
-		if (chat.messages.length) {
-			requestAnimationFrame(() => {
-				messages_container?.scrollTo({
-					top: messages_container.scrollHeight,
-					behavior: 'auto',
+				await fetch('/api/chats', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						id,
+						title,
+						messages: chat.messages,
+					}),
 				});
-			});
-		}
+
+				chat_history.refetch();
+				goto(`/chat/${id}`, { replaceState: true });
+			}
+		},
 	});
 
-	// Handle streaming scroll
-	$effect(() => {
-		if (!messages_container || !chat.current_response) return;
+	// Extract sources from message parts
+	function get_sources(message: (typeof chat.messages)[0]) {
+		return (message.parts?.filter(
+			(p) => p.type === 'source-document',
+		) ?? []) as Array<{
+			type: 'source-document';
+			sourceId: string;
+			mediaType: string;
+			title: string;
+			filename?: string;
+		}>;
+	}
 
-		// During streaming, use smooth scroll
-		requestAnimationFrame(() => {
-			messages_container?.scrollTo({
-				top: messages_container.scrollHeight,
-				behavior: 'smooth',
-			});
+	let input_value = $state('');
+	let container_ref = $state<HTMLElement | null>(null);
+	let end_ref = $state<HTMLElement | null>(null);
+	let scroll_locked = $state(false);
+
+	function get_message_text(
+		message: (typeof chat.messages)[0],
+	): string {
+		return (
+			message.parts
+				?.filter(
+					(p): p is { type: 'text'; text: string } =>
+						p.type === 'text',
+				)
+				.map((p) => p.text)
+				.join('') ?? ''
+		);
+	}
+
+	const loading = $derived(
+		chat.status === 'streaming' || chat.status === 'submitted',
+	);
+
+	// Auto-scroll effect
+	$effect(() => {
+		if (!(container_ref && end_ref)) return;
+
+		const observer = new MutationObserver(() => {
+			if (!end_ref || scroll_locked) return;
+			end_ref.scrollIntoView({ behavior: 'instant', block: 'end' });
 		});
+
+		observer.observe(container_ref, {
+			childList: true,
+			subtree: true,
+			characterData: true,
+		});
+
+		return () => observer.disconnect();
 	});
 
-	// Cleanup effect for EventSource
-	$effect(() => {
-		return () => {
-			if (event_source) {
-				event_source.close();
-				event_source = null;
-			}
-		};
-	});
+	function handle_scroll(e: Event) {
+		const el = e.target as HTMLElement;
+		const at_bottom =
+			el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+		scroll_locked = !at_bottom;
+	}
 
-	const handle_submit = async (event: SubmitEvent) => {
-		event.preventDefault();
-		if (!search_query.trim()) return;
+	async function submit_message() {
+		if (!input_value.trim() || loading) return;
+		const text = input_value;
+		input_value = '';
+		scroll_locked = false;
+		await chat.sendMessage({ text });
+	}
 
-		// Reset state and add user message
-		chat.set_loading(true);
-		chat.add_message('user', search_query);
-
-		try {
-			// Close existing connection if any
-			if (event_source) {
-				event_source.close();
-				event_source = null;
-			}
-
-			const response = await fetch('/api/search', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					query: search_query,
-					response_style: chat.response_style,
-				}),
-			});
-
-			if (!response.ok) {
-				throw new Error('Search request failed');
-			}
-
-			const reader = response.body?.getReader();
-			if (!reader) throw new Error('No reader available');
-
-			await handle_stream_response(reader, {
-				on_search_results: (data) => chat.set_search_results(data),
-				on_claude_response: (data) =>
-					chat.append_to_current_response(data),
-			});
-
-			search_query = '';
-		} catch (error) {
-			console.error('Search error:', error);
-			chat.add_message(
-				'assistant',
-				'Sorry, something went wrong. Please try again.',
-			);
-		} finally {
-			chat.finalize_response();
-			chat.set_loading(false);
+	function handle_key_down(e: KeyboardEvent) {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			submit_message();
 		}
-	};
+	}
 </script>
 
-<div class="bg-base-100 flex h-screen flex-col">
-	{#if !has_messages}
-		<!-- Initial centred view -->
-		<div
-			class="relative flex flex-1 flex-col items-center justify-center px-4"
-		>
-			<div class="fixed top-12 right-0 left-0 text-center">
-				<h1 class="text-primary mb-4 text-5xl font-bold">
-					{config.app_name}
-				</h1>
-				{#if config.app_description}
-					<p class="text-base-content/80 text-xl">
-						{config.app_description}
-					</p>
-				{/if}
-			</div>
-			<div class="-mt-8 w-full max-w-3xl">
-				<ChatForm
-					bind:search_query
-					is_loading={chat.is_loading}
-					response_style={chat.response_style}
-					on_submit={handle_submit}
-				/>
-			</div>
+<div class="flex h-screen flex-col bg-background">
+	<header class="flex items-center gap-2 border-b p-4">
+		<SidebarTrigger />
+		<div>
+			<h1 class="text-xl font-semibold">New Chat</h1>
+			<p class="text-sm text-muted-foreground">
+				Ask questions about your podcasts
+			</p>
 		</div>
-	{:else}
-		<!-- Chat view -->
-		<div class="bg-base-200/50 relative flex flex-1 justify-center">
-			<div class="absolute inset-0 overflow-hidden">
+	</header>
+
+	<main
+		bind:this={container_ref}
+		onscroll={handle_scroll}
+		class="flex-1 overflow-y-auto p-4"
+	>
+		<div class="mx-auto max-w-3xl space-y-6">
+			{#if chat.messages.length === 0}
 				<div
-					bind:this={messages_container}
-					class="h-full overflow-y-auto scroll-smooth"
+					class="flex h-full items-center justify-center text-center text-muted-foreground"
 				>
-					<div class="mx-auto w-full max-w-3xl px-4">
-						<div class="space-y-4 py-8 pb-32">
-							{#each chat.messages as message}
-								<ChatMessage
-									role={message.role}
-									content={message.content}
-								/>
-							{/each}
-
-							{#if chat.current_response}
-								<ChatMessage
-									role="assistant"
-									content={chat.current_response}
-								/>
-							{/if}
-
-							{#if chat.is_loading && !chat.current_response}
-								<ChatMessage
-									role="assistant"
-									content=""
-									is_loading={true}
-								/>
+					<div>
+						<p class="text-lg font-medium">No messages yet</p>
+						<p class="text-sm">
+							Ask a question about your podcasts to get started
+						</p>
+					</div>
+				</div>
+			{:else}
+				{#each chat.messages as message (message.id)}
+					<div
+						in:fly={{ y: 10, duration: 200 }}
+						class="flex gap-3 {message.role === 'user'
+							? 'justify-end'
+							: ''}"
+					>
+						{#if message.role === 'assistant'}
+							<div
+								class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted ring-1 ring-border"
+							>
+								<Sparkles class="h-4 w-4" />
+							</div>
+						{/if}
+						<div class="flex max-w-[80%] flex-col gap-1">
+							<div
+								class="rounded-2xl px-4 py-2 {message.role === 'user'
+									? 'bg-primary text-primary-foreground'
+									: 'bg-muted'}"
+							>
+								{#if message.role === 'assistant'}
+									<Markdown content={get_message_text(message)} />
+								{:else}
+									<p class="whitespace-pre-wrap">
+										{get_message_text(message)}
+									</p>
+								{/if}
+							</div>
+							{#if message.role === 'assistant'}
+								{@const sources = get_sources(message)}
+								{#if sources.length > 0}
+									<Sources {sources} />
+								{/if}
 							{/if}
 						</div>
 					</div>
-				</div>
+				{/each}
+				{#if loading && chat.messages.length > 0 && chat.messages[chat.messages.length - 1].role === 'user'}
+					<div in:fly={{ y: 10, duration: 200 }} class="flex gap-3">
+						<div
+							class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted ring-1 ring-border"
+						>
+							<Sparkles class="h-4 w-4" />
+						</div>
+						<div class="text-muted-foreground">
+							<span class="animate-pulse">Thinking...</span>
+						</div>
+					</div>
+				{/if}
+			{/if}
+			<div bind:this={end_ref} class="h-4"></div>
+		</div>
+	</main>
+
+	<footer class="border-t p-4">
+		<div class="mx-auto max-w-3xl">
+			<div class="flex gap-2">
+				<Textarea
+					bind:value={input_value}
+					placeholder="Ask about your podcasts..."
+					class="min-h-11 flex-1 resize-none"
+					onkeydown={handle_key_down}
+					rows={1}
+				/>
+				<Button
+					type="button"
+					size="icon"
+					class="h-11 w-11 shrink-0"
+					disabled={!input_value.trim() || loading}
+					onclick={submit_message}
+				>
+					<ArrowUp class="h-4 w-4" />
+				</Button>
 			</div>
 		</div>
-
-		<!-- Fixed bottom bar -->
-		<div class="bg-base-100 border-t shadow-lg">
-			<div class="mx-auto w-full max-w-3xl p-4">
-				<div class="flex items-start gap-4">
-					<!-- Search Results -->
-					<div class="flex-none">
-						<SearchResults results={chat.search_results} />
-					</div>
-
-					<!-- Chat Form -->
-					<div class="flex-1">
-						<ChatForm
-							bind:search_query
-							is_loading={chat.is_loading}
-							response_style={chat.response_style}
-							on_submit={handle_submit}
-						/>
-					</div>
-				</div>
-			</div>
-		</div>
-	{/if}
+	</footer>
 </div>

@@ -1,29 +1,33 @@
-import { TURSO_AUTH_TOKEN, TURSO_URL } from '$env/static/private';
-import { createClient } from '@libsql/client';
+import Database from 'better-sqlite3';
+import * as sqliteVec from 'sqlite-vec';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-export const db = createClient({
-	url: TURSO_URL,
-	authToken: TURSO_AUTH_TOKEN,
-});
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-// Initialize database tables
-export async function init_database() {
-	await db.execute(`
-    CREATE TABLE IF NOT EXISTS transcripts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      episode_title TEXT NOT NULL,
-      segment_text TEXT NOT NULL,
-      start_time REAL NOT NULL,
-      end_time REAL NOT NULL
-    )
-  `);
+const DB_PATH = join(__dirname, '../../../data/audiomind.db');
 
-	await db.execute(`
-    CREATE TABLE IF NOT EXISTS embeddings (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      transcript_id INTEGER NOT NULL,
-      embedding TEXT NOT NULL,
-      FOREIGN KEY(transcript_id) REFERENCES transcripts(id)
-    )
-  `);
+let db: Database.Database | null = null;
+
+export function get_db(): Database.Database {
+	if (!db) {
+		throw new Error(
+			'Database not initialized. Call init_database() first.',
+		);
+	}
+	return db;
+}
+
+export function init_database(): void {
+	if (db) return;
+
+	db = new Database(DB_PATH);
+	sqliteVec.load(db);
+
+	const schema = readFileSync(join(__dirname, 'schema.sql'), 'utf-8');
+	db.exec(schema);
+
+	console.log('Database initialized');
 }
