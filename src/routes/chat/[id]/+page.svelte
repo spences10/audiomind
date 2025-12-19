@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Markdown from '$lib/components/chat/markdown.svelte';
+	import Sources from '$lib/components/chat/sources.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { SidebarTrigger } from '$lib/components/ui/sidebar';
 	import { Textarea } from '$lib/components/ui/textarea';
@@ -25,6 +26,19 @@
 				},
 			}),
 	);
+
+	// Extract sources from message parts
+	function get_sources(message: (typeof chat.messages)[0]) {
+		return (message.parts?.filter(
+			(p) => p.type === 'source-document',
+		) ?? []) as Array<{
+			type: 'source-document';
+			sourceId: string;
+			mediaType: string;
+			title: string;
+			filename?: string;
+		}>;
+	}
 
 	let input_value = $state('');
 	let container_ref = $state<HTMLElement | null>(null);
@@ -121,18 +135,25 @@
 							<Sparkles class="h-4 w-4" />
 						</div>
 					{/if}
-					<div
-						class="max-w-[80%] rounded-2xl px-4 py-2 {message.role ===
-						'user'
-							? 'bg-primary text-primary-foreground'
-							: 'bg-muted'}"
-					>
+					<div class="flex max-w-[80%] flex-col gap-1">
+						<div
+							class="rounded-2xl px-4 py-2 {message.role === 'user'
+								? 'bg-primary text-primary-foreground'
+								: 'bg-muted'}"
+						>
+							{#if message.role === 'assistant'}
+								<Markdown content={get_message_text(message)} />
+							{:else}
+								<p class="whitespace-pre-wrap">
+									{get_message_text(message)}
+								</p>
+							{/if}
+						</div>
 						{#if message.role === 'assistant'}
-							<Markdown content={get_message_text(message)} />
-						{:else}
-							<p class="whitespace-pre-wrap">
-								{get_message_text(message)}
-							</p>
+							{@const sources = get_sources(message)}
+							{#if sources.length > 0}
+								<Sources {sources} />
+							{/if}
 						{/if}
 					</div>
 				</div>

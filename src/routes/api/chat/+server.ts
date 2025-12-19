@@ -4,7 +4,7 @@ import {
 } from '$env/static/private';
 import { get_db } from '$lib/server/database';
 import { createAnthropic } from '@ai-sdk/anthropic';
-import { streamText } from 'ai';
+import { createUIMessageStreamResponse, streamText } from 'ai';
 import type { RequestHandler } from './$types';
 
 interface SearchResult {
@@ -123,23 +123,35 @@ If the context doesn't contain relevant information, say so.
 Context:
 ${context}`;
 
-	// Convert messages to AI SDK format
-	const core_messages = messages.map(
-		(m: {
-			role: string;
-			parts?: { type: string; text: string }[];
-			content?: string;
-		}) => ({
-			role: m.role as 'user' | 'assistant',
-			content:
-				m.parts
-					?.filter((p) => p.type === 'text')
-					.map((p) => p.text)
-					.join(' ') ||
-				m.content ||
-				'',
-		}),
-	);
+	// Convert messages to AI SDK format, filtering out empty messages
+	const core_messages = messages
+		.map(
+			(m: {
+				role: string;
+				parts?: { type: string; text: string }[];
+				content?: string;
+			}) => ({
+				role: m.role as 'user' | 'assistant',
+				content:
+					m.parts
+						?.filter((p) => p.type === 'text')
+						.map((p) => p.text)
+						.join(' ')
+						.trim() ||
+					m.content?.trim() ||
+					'',
+			}),
+		)
+		.filter((m) => m.content.length > 0);
+
+	// Prepare sources for injection
+	const sources = search_results.map((r, i) => ({
+		type: 'source-document' as const,
+		sourceId: `${i + 1}`,
+		mediaType: 'text/plain',
+		title: `${r.podcast_name} - ${r.episode_title}`,
+		filename: `${format_time(r.start_time)} - ${format_time(r.end_time)}`,
+	}));
 
 	const result = streamText({
 		model: anthropic('claude-haiku-4-5-20251001'),
@@ -147,5 +159,28 @@ ${context}`;
 		messages: core_messages,
 	});
 
-	return result.toUIMessageStreamResponse();
+	// Get the base UI stream and transform it to inject sources before finish
+	const baseStream = result.toUIMessageStream();
+
+	const transformedStream = baseStream.pipeThrough(
+		new TransformStream({
+			transform(chunk, controller) {
+				// If this is the finish chunk, inject sources before it
+				if (chunk.type === 'finish') {
+					for (const source of sources) {
+						controller.enqueue(source);
+					}
+				}
+				controller.enqueue(chunk);
+			},
+		}),
+	);
+
+	return createUIMessageStreamResponse({ stream: transformedStream });
 };
+
+function format_time(seconds: number): string {
+	const mins = Math.floor(seconds / 60);
+	const secs = Math.floor(seconds % 60);
+	return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
