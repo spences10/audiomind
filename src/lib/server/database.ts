@@ -1,6 +1,6 @@
 import Database from 'better-sqlite3';
 import * as sqliteVec from 'sqlite-vec';
-import { readFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -22,6 +22,11 @@ export function get_db(): Database.Database {
 
 export function init_database(): void {
 	if (db) return;
+
+	const db_dir = dirname(DB_PATH);
+	if (!existsSync(db_dir)) {
+		mkdirSync(db_dir, { recursive: true });
+	}
 
 	db = new Database(DB_PATH);
 	sqliteVec.load(db);
