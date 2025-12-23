@@ -57,7 +57,7 @@
 		"vitest-browser-svelte": "^2.0.1"
 	},
 	"dependencies": {
-		"@ai-sdk/anthropic": "^2.0.56",
+		"@ai-sdk/anthropic": "^3.0.0",
 		"@ai-sdk/svelte": "^3.0.116",
 		"@deepgram/sdk": "^4.11.3",
 		"ai": "^5.0.116",
