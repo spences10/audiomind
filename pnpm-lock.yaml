@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@ai-sdk/anthropic':
         specifier: ^2.0.56
-        version: 2.0.56(zod@4.2.1)
+        version: 2.0.57(zod@4.2.1)
       '@ai-sdk/svelte':
         specifier: ^3.0.116
         version: 3.0.116(svelte@5.46.0)(zod@4.2.1)
@@ -159,8 +159,8 @@ importers:
 
 packages:
 
-  '@ai-sdk/anthropic@2.0.56':
-    resolution: {integrity: sha512-XHJKu0Yvfu9SPzRfsAFESa+9T7f2YJY6TxykKMfRsAwpeWAiX/Gbx5J5uM15AzYC3Rw8tVP3oH+j7jEivENirQ==}
+  '@ai-sdk/anthropic@2.0.57':
+    resolution: {integrity: sha512-DREpYqW2pylgaj69gZ+K8u92bo9DaMgFdictYnY+IwYeY3bawQ4zI7l/o1VkDsBDljAx8iYz5lPURwVZNu+Xpg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -2790,10 +2790,10 @@ packages:
 
 snapshots:
 
-  '@ai-sdk/anthropic@2.0.56(zod@4.2.1)':
+  '@ai-sdk/anthropic@2.0.57(zod@4.2.1)':
     dependencies:
-      '@ai-sdk/provider': 2.0.0
-      '@ai-sdk/provider-utils': 3.0.19(zod@4.2.1)
+      '@ai-sdk/provider': 2.0.1
+      '@ai-sdk/provider-utils': 3.0.20(zod@4.2.1)
       zod: 4.2.1
 
   '@ai-sdk/gateway@2.0.23(zod@4.2.1)':
