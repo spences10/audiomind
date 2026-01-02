@@ -60,7 +60,7 @@
 		"@ai-sdk/anthropic": "^3.0.0",
 		"@ai-sdk/svelte": "^3.0.116",
 		"@deepgram/sdk": "^4.11.3",
-		"ai": "^5.0.116",
+		"ai": "^6.0.0",
 		"better-sqlite3": "^12.5.0",
 		"citty": "^0.1.6",
 		"date-fns": "^4.1.0",
