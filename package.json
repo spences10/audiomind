@@ -58,7 +58,7 @@
 	},
 	"dependencies": {
 		"@ai-sdk/anthropic": "^3.0.0",
-		"@ai-sdk/svelte": "^3.0.116",
+		"@ai-sdk/svelte": "^4.0.0",
 		"@deepgram/sdk": "^4.11.3",
 		"ai": "^6.0.0",
 		"better-sqlite3": "^12.5.0",
