@@ -12,14 +12,14 @@ importers:
         specifier: ^3.0.9
         version: 3.0.9(zod@4.3.5)
       '@ai-sdk/svelte':
-        specifier: ^4.0.19
-        version: 4.0.19(svelte@5.46.1)(zod@4.3.5)
+        specifier: ^4.0.23
+        version: 4.0.23(svelte@5.46.1)(zod@4.3.5)
       '@deepgram/sdk':
         specifier: ^4.11.3
         version: 4.11.3
       ai:
-        specifier: ^6.0.19
-        version: 6.0.19(zod@4.3.5)
+        specifier: ^6.0.23
+        version: 6.0.23(zod@4.3.5)
       better-sqlite3:
         specifier: ^12.5.0
         version: 12.5.0
@@ -106,8 +106,8 @@ importers:
         specifier: ^10.1.8
         version: 10.1.8(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-svelte:
-        specifier: ^3.13.1
-        version: 3.13.1(eslint@9.39.2(jiti@2.6.1))(svelte@5.46.1)
+        specifier: ^3.14.0
+        version: 3.14.0(eslint@9.39.2(jiti@2.6.1))(svelte@5.46.1)
       globals:
         specifier: ^17.0.0
         version: 17.0.0
@@ -181,8 +181,8 @@ packages:
     resolution: {integrity: sha512-HrEmNt/BH/hkQ7zpi2o6N3k1ZR1QTb7z85WYhYygiTxOQuaml4CMtHCWRbric5WPU+RNsYI7r1EpyVQMKO1pYw==}
     engines: {node: '>=18'}
 
-  '@ai-sdk/svelte@4.0.19':
-    resolution: {integrity: sha512-n9c1d1DynzSdaP8ETvJZLaT2fOFL6waO+U0XugTojbaKwT4ggrXh6GQ8tDPEq+MCPcFMbK+xtyUx+s6Fd+tLiA==}
+  '@ai-sdk/svelte@4.0.23':
+    resolution: {integrity: sha512-W0jbE+041Qo3wgSBvXsYAbXEkDsy6eYsA4h9xqlbgxyskcR6IqDgA4m/HC6bX/cSlDImXVtItishqfnXSuOXSg==}
     peerDependencies:
       svelte: ^5.31.0
 
@@ -1044,8 +1044,8 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  ai@6.0.19:
-    resolution: {integrity: sha512-LCqc4/ecL2jNvUfJ3vwz+UPuZvtPDONEjZJSw9XtYCjI6FuyBu9oJKlPMK2Mlj/10bWaNoJ+PnI+tDZLl4y06A==}
+  ai@6.0.23:
+    resolution: {integrity: sha512-IV8hqp6sQvZ0XVlu8bCnFlwG7+2d40ff26RZ1k4yw/zVuk2F6SXlONURtTo9vwPOPYeF7auXvyPA+dMDoepWxg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -1445,8 +1445,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-svelte@3.13.1:
-    resolution: {integrity: sha512-Ng+kV/qGS8P/isbNYVE3sJORtubB+yLEcYICMkUWNaDTb0SwZni/JhAYXh/Dz/q2eThUwWY0VMPZ//KYD1n3eQ==}
+  eslint-plugin-svelte@3.14.0:
+    resolution: {integrity: sha512-Isw0GvaMm0yHxAj71edAdGFh28ufYs+6rk2KlbbZphnqZAzrH3Se3t12IFh2H9+1F/jlDhBBL4oiOJmLqmYX0g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.1 || ^9.0.0
@@ -2807,10 +2807,10 @@ snapshots:
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/svelte@4.0.19(svelte@5.46.1)(zod@4.3.5)':
+  '@ai-sdk/svelte@4.0.23(svelte@5.46.1)(zod@4.3.5)':
     dependencies:
       '@ai-sdk/provider-utils': 4.0.4(zod@4.3.5)
-      ai: 6.0.19(zod@4.3.5)
+      ai: 6.0.23(zod@4.3.5)
       svelte: 5.46.1
     transitivePeerDependencies:
       - zod
@@ -3637,7 +3637,7 @@ snapshots:
 
   acorn@8.15.0: {}
 
-  ai@6.0.19(zod@4.3.5):
+  ai@6.0.23(zod@4.3.5):
     dependencies:
       '@ai-sdk/gateway': 3.0.10(zod@4.3.5)
       '@ai-sdk/provider': 3.0.2
@@ -4071,7 +4071,7 @@ snapshots:
     dependencies:
       eslint: 9.39.2(jiti@2.6.1)
 
-  eslint-plugin-svelte@3.13.1(eslint@9.39.2(jiti@2.6.1))(svelte@5.46.1):
+  eslint-plugin-svelte@3.14.0(eslint@9.39.2(jiti@2.6.1))(svelte@5.46.1):
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.2(jiti@2.6.1))
       '@jridgewell/sourcemap-codec': 1.5.5
