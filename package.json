@@ -62,7 +62,7 @@
 		"@deepgram/sdk": "^4.11.3",
 		"ai": "^6.0.39",
 		"better-sqlite3": "^12.6.2",
-		"citty": "^0.1.6",
+		"citty": "^0.2.0",
 		"date-fns": "^4.1.0",
 		"mode-watcher": "^1.1.0",
 		"music-metadata": "^11.10.6",
