@@ -19,7 +19,7 @@ importers:
         version: 4.11.3
       ai:
         specifier: ^6.0.55
-        version: 6.0.55(zod@4.3.5)
+        version: 6.0.58(zod@4.3.5)
       better-sqlite3:
         specifier: ^12.6.2
         version: 12.6.2
@@ -167,6 +167,12 @@ packages:
 
   '@ai-sdk/gateway@3.0.24':
     resolution: {integrity: sha512-gf8AsKMZWlAQBbTYEUyj57AGmmpqXxY3iytVz4KBD2pRYsEPEHDpdLbSnYcYP06U60j6HeJTgkeaIjHxezvtEw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/gateway@3.0.26':
+    resolution: {integrity: sha512-VuxFq/EfzOJb1Rtl/S4F1HCuGK14uoGSCmeRsGmgpIPy16KwFwZ2N5tBhJqyJDlP5aIPlwQq47eUnMAlIslK3Q==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -1069,6 +1075,12 @@ packages:
 
   ai@6.0.55:
     resolution: {integrity: sha512-rAbAPgqN8JUlnDTtCUsAqvZ5NiDkre6AC3c1Qg4RDmshHxZaHq8Xk0Q6XcAiiT7XaNWw5QiW60Z+G7ZVTxV5/g==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  ai@6.0.58:
+    resolution: {integrity: sha512-uuDszl78AfqWYD0jbd/L9ct3JGLKbKgmrQu1PaSiI2a9HYA1o9CAGUp0O7NTOcQbiyqiUSrn8JjgnxiEbCkNgw==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -2822,6 +2834,13 @@ snapshots:
       '@vercel/oidc': 3.1.0
       zod: 4.3.5
 
+  '@ai-sdk/gateway@3.0.26(zod@4.3.5)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.5
+      '@ai-sdk/provider-utils': 4.0.10(zod@4.3.5)
+      '@vercel/oidc': 3.1.0
+      zod: 4.3.5
+
   '@ai-sdk/provider-utils@4.0.10(zod@4.3.5)':
     dependencies:
       '@ai-sdk/provider': 3.0.5
@@ -3670,6 +3689,14 @@ snapshots:
   ai@6.0.55(zod@4.3.5):
     dependencies:
       '@ai-sdk/gateway': 3.0.24(zod@4.3.5)
+      '@ai-sdk/provider': 3.0.5
+      '@ai-sdk/provider-utils': 4.0.10(zod@4.3.5)
+      '@opentelemetry/api': 1.9.0
+      zod: 4.3.5
+
+  ai@6.0.58(zod@4.3.5):
+    dependencies:
+      '@ai-sdk/gateway': 3.0.26(zod@4.3.5)
       '@ai-sdk/provider': 3.0.5
       '@ai-sdk/provider-utils': 4.0.10(zod@4.3.5)
       '@opentelemetry/api': 1.9.0
