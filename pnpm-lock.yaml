@@ -95,7 +95,7 @@ importers:
         version: 4.0.18(playwright@1.58.0)(vite@7.3.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.30.2))(vitest@4.0.18)
       bits-ui:
         specifier: ^2.15.4
-        version: 2.15.4(@internationalized/date@3.10.1)(@sveltejs/kit@2.50.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.48.4)(vite@7.3.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.48.4)(typescript@5.9.3)(vite@7.3.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.48.4)
+        version: 2.15.5(@internationalized/date@3.10.1)(@sveltejs/kit@2.50.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.48.4)(vite@7.3.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.48.4)(typescript@5.9.3)(vite@7.3.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.48.4)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -161,12 +161,6 @@ packages:
 
   '@ai-sdk/anthropic@3.0.28':
     resolution: {integrity: sha512-pNo2B2Rb8nVP7C/5ZATLtV0Dwl8LouJ3gs2NJQBMiq0g66T3qjfuqqAXiK+wA3zohzDbR04ZktvMgdD2kOkVzg==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.25.76 || ^4.1.8
-
-  '@ai-sdk/gateway@3.0.24':
-    resolution: {integrity: sha512-gf8AsKMZWlAQBbTYEUyj57AGmmpqXxY3iytVz4KBD2pRYsEPEHDpdLbSnYcYP06U60j6HeJTgkeaIjHxezvtEw==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -431,11 +425,14 @@ packages:
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@floating-ui/core@1.7.3':
-    resolution: {integrity: sha512-sGnvb5dmrJaKEZ+LDIpguvdX3bDlEllmv4/ClQ9awcmCZrlx5jQyyMWFM5kBI+EyNOCDDiKk8il0zeuX3Zlg/w==}
+  '@floating-ui/core@1.7.4':
+    resolution: {integrity: sha512-C3HlIdsBxszvm5McXlB8PeOEWfBhcGBTZGkGlWc2U0KFY5IwG5OQEuQ8rq52DZmcHDlPLd+YFBK+cZcytwIFWg==}
 
   '@floating-ui/dom@1.7.4':
     resolution: {integrity: sha512-OOchDgh4F2CchOX94cRVqhvy7b3AFb+/rQXyswmzmGakRfkMgoWVjfnLWkRirfLEfuD4ysVW16eXzwt3jHIzKA==}
+
+  '@floating-ui/dom@1.7.5':
+    resolution: {integrity: sha512-N0bD2kIPInNHUHehXhMke1rBGs1dwqvC9O9KYMyyjK7iXt7GAhnro7UlcuYcGdS/yYOlq0MAVgrow8IbWJwyqg==}
 
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
@@ -1073,12 +1070,6 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  ai@6.0.55:
-    resolution: {integrity: sha512-rAbAPgqN8JUlnDTtCUsAqvZ5NiDkre6AC3c1Qg4RDmshHxZaHq8Xk0Q6XcAiiT7XaNWw5QiW60Z+G7ZVTxV5/g==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.25.76 || ^4.1.8
-
   ai@6.0.58:
     resolution: {integrity: sha512-uuDszl78AfqWYD0jbd/L9ct3JGLKbKgmrQu1PaSiI2a9HYA1o9CAGUp0O7NTOcQbiyqiUSrn8JjgnxiEbCkNgw==}
     engines: {node: '>=18'}
@@ -1123,8 +1114,8 @@ packages:
   bindings@1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
 
-  bits-ui@2.15.4:
-    resolution: {integrity: sha512-7H9YUfp03KOk1LVDh8wPYSRPxlZgG/GRWLNSA8QC73/8Z8ytun+DWJhIuibyFyz7A0cP/RANVcB4iDrbY8q+Og==}
+  bits-ui@2.15.5:
+    resolution: {integrity: sha512-WhS+P+E//ClLfKU6KqjKC17nGDRLnz+vkwoP6ClFUPd5m1fFVDxTElPX8QVsduLj5V1KFDxlnv6sW2G5Lqk+vw==}
     engines: {node: '>=20'}
     peerDependencies:
       '@internationalized/date': ^3.8.1
@@ -2827,13 +2818,6 @@ snapshots:
       '@ai-sdk/provider-utils': 4.0.10(zod@4.3.5)
       zod: 4.3.5
 
-  '@ai-sdk/gateway@3.0.24(zod@4.3.5)':
-    dependencies:
-      '@ai-sdk/provider': 3.0.5
-      '@ai-sdk/provider-utils': 4.0.10(zod@4.3.5)
-      '@vercel/oidc': 3.1.0
-      zod: 4.3.5
-
   '@ai-sdk/gateway@3.0.26(zod@4.3.5)':
     dependencies:
       '@ai-sdk/provider': 3.0.5
@@ -3037,13 +3021,18 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
-  '@floating-ui/core@1.7.3':
+  '@floating-ui/core@1.7.4':
     dependencies:
       '@floating-ui/utils': 0.2.10
 
   '@floating-ui/dom@1.7.4':
     dependencies:
-      '@floating-ui/core': 1.7.3
+      '@floating-ui/core': 1.7.4
+      '@floating-ui/utils': 0.2.10
+
+  '@floating-ui/dom@1.7.5':
+    dependencies:
+      '@floating-ui/core': 1.7.4
       '@floating-ui/utils': 0.2.10
 
   '@floating-ui/utils@0.2.10': {}
@@ -3686,14 +3675,6 @@ snapshots:
 
   acorn@8.15.0: {}
 
-  ai@6.0.55(zod@4.3.5):
-    dependencies:
-      '@ai-sdk/gateway': 3.0.24(zod@4.3.5)
-      '@ai-sdk/provider': 3.0.5
-      '@ai-sdk/provider-utils': 4.0.10(zod@4.3.5)
-      '@opentelemetry/api': 1.9.0
-      zod: 4.3.5
-
   ai@6.0.58(zod@4.3.5):
     dependencies:
       '@ai-sdk/gateway': 3.0.26(zod@4.3.5)
@@ -3736,10 +3717,10 @@ snapshots:
     dependencies:
       file-uri-to-path: 1.0.0
 
-  bits-ui@2.15.4(@internationalized/date@3.10.1)(@sveltejs/kit@2.50.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.48.4)(vite@7.3.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.48.4)(typescript@5.9.3)(vite@7.3.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.48.4):
+  bits-ui@2.15.5(@internationalized/date@3.10.1)(@sveltejs/kit@2.50.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.48.4)(vite@7.3.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.48.4)(typescript@5.9.3)(vite@7.3.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.48.4):
     dependencies:
-      '@floating-ui/core': 1.7.3
-      '@floating-ui/dom': 1.7.4
+      '@floating-ui/core': 1.7.4
+      '@floating-ui/dom': 1.7.5
       '@internationalized/date': 3.10.1
       esm-env: 1.2.2
       runed: 0.35.1(@sveltejs/kit@2.50.1(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.48.4)(vite@7.3.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.48.4)(typescript@5.9.3)(vite@7.3.1(@types/node@25.1.0)(jiti@2.6.1)(lightningcss@1.30.2)))(svelte@5.48.4)
