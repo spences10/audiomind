@@ -24,7 +24,7 @@
 		"@eslint/compat": "^2.0.2",
 		"@eslint/js": "^10.0.0",
 		"@internationalized/date": "^3.11.0",
-		"@lucide/svelte": "^0.564.0",
+		"@lucide/svelte": "^0.575.0",
 		"@playwright/test": "^1.58.1",
 		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/kit": "^2.50.2",
