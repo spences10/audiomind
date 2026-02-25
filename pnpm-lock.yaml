@@ -25,7 +25,7 @@ importers:
         version: 12.6.2
       citty:
         specifier: ^0.2.0
-        version: 0.2.0
+        version: 0.2.1
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -1159,8 +1159,8 @@ packages:
   chownr@1.1.4:
     resolution: {integrity: sha512-jJ0bqzaylmJtVnNgzTeSOs8DPavpbYgEr/b0YL8/2GO3xJEhInFmhKMUnEJQjZumK7KXGFhUy89PrsJWlakBVg==}
 
-  citty@0.2.0:
-    resolution: {integrity: sha512-8csy5IBFI2ex2hTVpaHN2j+LNE199AgiI7y4dMintrr8i0lQiFn+0AWMZrWdHKIgMOer65f8IThysYhoReqjWA==}
+  citty@0.2.1:
+    resolution: {integrity: sha512-kEV95lFBhQgtogAPlQfJJ0WGVSokvLr/UEoFPiKKOXF7pl98HfUVUD0ejsuTCld/9xH9vogSywZ5KqHzXrZpqg==}
 
   clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
@@ -3710,7 +3710,7 @@ snapshots:
 
   chownr@1.1.4: {}
 
-  citty@0.2.0: {}
+  citty@0.2.1: {}
 
   clsx@2.1.1: {}
 
