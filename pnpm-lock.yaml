@@ -13,7 +13,7 @@ importers:
         version: 3.0.47(zod@4.3.5)
       '@ai-sdk/svelte':
         specifier: ^4.0.70
-        version: 4.0.103(svelte@5.51.5)(zod@4.3.5)
+        version: 4.0.106(svelte@5.51.5)(zod@4.3.5)
       '@deepgram/sdk':
         specifier: ^4.11.3
         version: 4.11.3
@@ -193,8 +193,8 @@ packages:
     resolution: {integrity: sha512-oGMAgGoQdBXbZqNG0Ze56CHjDZ1IDYOwGYxYjO5KLSlz5HiNQ9udIXsPZ61VWaHGZ5XW/jyjmr6t2xz2jGVwbQ==}
     engines: {node: '>=18'}
 
-  '@ai-sdk/svelte@4.0.103':
-    resolution: {integrity: sha512-VW0NFXvg9prX67hHgiszkvDoEJ+ocFc0/cq4cFctjqGDFKRygtndYs/E9nQLYV57dxpY4YX5/jcuC4w+NiL3qw==}
+  '@ai-sdk/svelte@4.0.106':
+    resolution: {integrity: sha512-j3FpgPcnYUXOs/iuOxhf0FTdv7FVNUrzLXXq9wLy9xm+Kn9Sc7D7WqPOVSpUF6nOUnf5o3w5EcIKqpUQdbXYZg==}
     peerDependencies:
       svelte: ^5.31.0
 
@@ -2827,10 +2827,10 @@ snapshots:
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/svelte@4.0.103(svelte@5.51.5)(zod@4.3.5)':
+  '@ai-sdk/svelte@4.0.106(svelte@5.51.5)(zod@4.3.5)':
     dependencies:
-      '@ai-sdk/provider-utils': 4.0.15(zod@4.3.5)
-      ai: 6.0.103(zod@4.3.5)
+      '@ai-sdk/provider-utils': 4.0.16(zod@4.3.5)
+      ai: 6.0.106(zod@4.3.5)
       svelte: 5.51.5
     transitivePeerDependencies:
       - zod
