@@ -19,7 +19,7 @@ importers:
         version: 5.0.0
       ai:
         specifier: ^6.0.70
-        version: 6.0.116(zod@4.3.5)
+        version: 6.0.134(zod@4.3.5)
       better-sqlite3:
         specifier: ^12.6.2
         version: 12.8.0
