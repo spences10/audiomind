@@ -64,8 +64,8 @@ importers:
         specifier: ^3.11.0
         version: 3.12.0
       '@lucide/svelte':
-        specifier: ^0.577.0
-        version: 0.577.0(svelte@5.54.1)
+        specifier: ^1.0.0
+        version: 1.0.1(svelte@5.54.1)
       '@playwright/test':
         specifier: ^1.58.1
         version: 1.58.2
@@ -167,12 +167,6 @@ packages:
 
   '@ai-sdk/gateway@3.0.77':
     resolution: {integrity: sha512-UdwIG2H2YMuntJQ5L+EmED5XiwnlvDT3HOmKfVFxR4Nq/RSLFA/HcchhwfNXHZ5UJjyuL2VO0huLbWSZ9ijemQ==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.25.76 || ^4.1.8
-
-  '@ai-sdk/provider-utils@4.0.19':
-    resolution: {integrity: sha512-3eG55CrSWCu2SXlqq2QCsFjo3+E7+Gmg7i/oRVoSZzIodTuDSfLb3MRje67xE9RFea73Zao7Lm4mADIfUETKGg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -492,8 +486,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@lucide/svelte@0.577.0':
-    resolution: {integrity: sha512-0P6mkySd2MapIEgq08tADPmcN4DHndC/02PWwaLkOerXlx5Sv9aT4BxyXLIY+eccr0g/nEyCYiJesqS61YdBZQ==}
+  '@lucide/svelte@1.0.1':
+    resolution: {integrity: sha512-iIcE+CDaHtjVKT5UkpnBIRy1b51u29RHgQxrjy5SMTp/KyqbtNfzkWnmWpBoCWKs2RKiF/e8VW+z0dw+wpb4Rw==}
     peerDependencies:
       svelte: ^5
 
@@ -2724,13 +2718,6 @@ snapshots:
       '@vercel/oidc': 3.1.0
       zod: 4.3.5
 
-  '@ai-sdk/provider-utils@4.0.19(zod@4.3.5)':
-    dependencies:
-      '@ai-sdk/provider': 3.0.8
-      '@standard-schema/spec': 1.1.0
-      eventsource-parser: 3.0.6
-      zod: 4.3.5
-
   '@ai-sdk/provider-utils@4.0.21(zod@4.3.5)':
     dependencies:
       '@ai-sdk/provider': 3.0.8
@@ -2979,7 +2966,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@lucide/svelte@0.577.0(svelte@5.54.1)':
+  '@lucide/svelte@1.0.1(svelte@5.54.1)':
     dependencies:
       svelte: 5.54.1
 
