@@ -16,7 +16,7 @@ importers:
         version: 4.0.169(svelte@5.55.5(@typescript-eslint/types@8.59.1))(zod@4.3.6)
       '@deepgram/sdk':
         specifier: ^5.0.0
-        version: 5.1.0
+        version: 5.2.0
       ai:
         specifier: ^6.0.70
         version: 6.0.169(zod@4.3.6)
@@ -214,8 +214,8 @@ packages:
   '@chevrotain/utils@12.0.0':
     resolution: {integrity: sha512-lB59uJoaGIfOOL9knQqQRfhl9g7x8/wqFkp13zTdkRu1huG9kg6IJs1O8hqj9rs6h7orGxHJUKb+mX3rPbWGhA==}
 
-  '@deepgram/sdk@5.1.0':
-    resolution: {integrity: sha512-pw4JsFLglvIAjk1C4rALHYBW5dHt30d3j25jsJhvoexTziLSTBK9LJlpeml/UDwHMILu4ZbBs3o0ZsF9DaHuZQ==}
+  '@deepgram/sdk@5.2.0':
+    resolution: {integrity: sha512-h9cIiN8RmrJeH6F0colajsXjB4bwiMP1ryuADiRHIaRdsVBKtWRA3js9edWdTKPOaclsCLrQEfvRXIHvqTTtPA==}
     engines: {node: '>=18.0.0'}
 
   '@emnapi/core@1.10.0':
@@ -830,6 +830,7 @@ packages:
 
   '@ungap/structured-clone@1.3.0':
     resolution: {integrity: sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==}
+    deprecated: Potential CWE-502 - Update to 1.3.1 or higher
 
   '@upsetjs/venn.js@2.0.0':
     resolution: {integrity: sha512-WbBhLrooyePuQ1VZxrJjtLvTc4NVfpOyKx0sKqioq9bX1C1m7Jgykkn8gLrtwumBioXIqam8DLxp88Adbue6Hw==}
@@ -2616,7 +2617,7 @@ snapshots:
 
   '@chevrotain/utils@12.0.0': {}
 
-  '@deepgram/sdk@5.1.0':
+  '@deepgram/sdk@5.2.0':
     dependencies:
       ws: 8.20.0
     transitivePeerDependencies:
