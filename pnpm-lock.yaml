@@ -95,7 +95,7 @@ importers:
         version: 4.1.5(playwright@1.59.1)(vite@8.0.10(@types/node@25.6.0)(jiti@2.6.1))(vitest@4.1.5)
       bits-ui:
         specifier: ^2.15.5
-        version: 2.18.0(@internationalized/date@3.12.1)(@sveltejs/kit@2.58.0(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.5(@typescript-eslint/types@8.59.1))(vite@8.0.10(@types/node@25.6.0)(jiti@2.6.1)))(svelte@5.55.5(@typescript-eslint/types@8.59.1))(typescript@6.0.3)(vite@8.0.10(@types/node@25.6.0)(jiti@2.6.1)))(svelte@5.55.5(@typescript-eslint/types@8.59.1))
+        version: 2.19.2(@internationalized/date@3.12.1)(@sveltejs/kit@2.58.0(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.5(@typescript-eslint/types@8.59.1))(vite@8.0.10(@types/node@25.6.0)(jiti@2.6.1)))(svelte@5.55.5(@typescript-eslint/types@8.59.1))(typescript@6.0.3)(vite@8.0.10(@types/node@25.6.0)(jiti@2.6.1)))(svelte@5.55.5(@typescript-eslint/types@8.59.1))
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -926,8 +926,8 @@ packages:
   bindings@1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
 
-  bits-ui@2.18.0:
-    resolution: {integrity: sha512-GLOBZRVy3hxNHIQ2MpD/+5aK9KcBFZRhUJtZ1UDABXdlVR4K6zFpgt4T+Rwuhf2sQzlc6yK1q/DprHPjwT4Pjw==}
+  bits-ui@2.19.2:
+    resolution: {integrity: sha512-W9upilTmLTIWjuVAD6Ta7XoS6gxRflmCQnXamj+WN1eYxZecghqGENpuSMAKQmVENMLXhh85BZb04LCrBd2+Ng==}
     engines: {node: '>=20'}
     peerDependencies:
       '@internationalized/date': ^3.8.1
@@ -3354,7 +3354,7 @@ snapshots:
     dependencies:
       file-uri-to-path: 1.0.0
 
-  bits-ui@2.18.0(@internationalized/date@3.12.1)(@sveltejs/kit@2.58.0(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.5(@typescript-eslint/types@8.59.1))(vite@8.0.10(@types/node@25.6.0)(jiti@2.6.1)))(svelte@5.55.5(@typescript-eslint/types@8.59.1))(typescript@6.0.3)(vite@8.0.10(@types/node@25.6.0)(jiti@2.6.1)))(svelte@5.55.5(@typescript-eslint/types@8.59.1)):
+  bits-ui@2.19.2(@internationalized/date@3.12.1)(@sveltejs/kit@2.58.0(@opentelemetry/api@1.9.0)(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.5(@typescript-eslint/types@8.59.1))(vite@8.0.10(@types/node@25.6.0)(jiti@2.6.1)))(svelte@5.55.5(@typescript-eslint/types@8.59.1))(typescript@6.0.3)(vite@8.0.10(@types/node@25.6.0)(jiti@2.6.1)))(svelte@5.55.5(@typescript-eslint/types@8.59.1)):
     dependencies:
       '@floating-ui/core': 1.7.5
       '@floating-ui/dom': 1.7.6
