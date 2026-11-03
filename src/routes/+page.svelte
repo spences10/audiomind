@@ -119,7 +119,7 @@
 		<div>
 			<h1 class="text-xl font-semibold">New Chat</h1>
 			<p class="text-sm text-muted-foreground">
-				Ask questions about your podcasts
+				Ask questions about your audio
 			</p>
 		</div>
 	</header>
@@ -137,7 +137,7 @@
 					<div>
 						<p class="text-lg font-medium">No messages yet</p>
 						<p class="text-sm">
-							Ask a question about your podcasts to get started
+							Ask a question about your audio to get started
 						</p>
 					</div>
 				</div>
@@ -201,7 +201,7 @@
 			<div class="flex gap-2">
 				<Textarea
 					bind:value={input_value}
-					placeholder="Ask about your podcasts..."
+					placeholder="Ask about your audio..."
 					class="min-h-11 flex-1 resize-none"
 					onkeydown={handle_key_down}
 					rows={1}

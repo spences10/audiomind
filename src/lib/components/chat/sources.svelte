@@ -33,7 +33,7 @@
 			<Sheet.Header>
 				<Sheet.Title>Sources</Sheet.Title>
 				<Sheet.Description>
-					Referenced podcast segments for this response
+					Referenced transcript segments for this response
 				</Sheet.Description>
 			</Sheet.Header>
 			<div class="mt-4 flex flex-1 flex-col gap-4 overflow-y-auto">

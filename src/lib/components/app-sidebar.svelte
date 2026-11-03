@@ -170,7 +170,7 @@
 
 	<SidebarFooter>
 		<p class="px-4 py-2 text-xs text-muted-foreground">
-			Ask questions about your podcasts
+			Ask questions about your audio
 		</p>
 	</SidebarFooter>
 </Sidebar>

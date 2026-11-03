@@ -110,7 +110,7 @@
 		<div>
 			<h1 class="text-xl font-semibold">{data.chat.title}</h1>
 			<p class="text-sm text-muted-foreground">
-				Ask questions about your podcasts
+				Ask questions about your audio
 			</p>
 		</div>
 	</header>
@@ -179,7 +179,7 @@
 			<div class="flex gap-2">
 				<Textarea
 					bind:value={input_value}
-					placeholder="Ask about your podcasts..."
+					placeholder="Ask about your audio..."
 					class="min-h-11 flex-1 resize-none"
 					onkeydown={handle_key_down}
 					rows={1}
