@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	const db = get_db();
 	const chat = db
 		.prepare('SELECT * FROM chats WHERE id = ?')
-		.get(params.id) as ChatRow | undefined;
+		.get(params.id) as unknown as ChatRow | undefined;
 
 	if (!chat) {
 		throw error(404, 'Chat not found');

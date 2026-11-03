@@ -29,7 +29,7 @@ export const get_chats = query(async (): Promise<ChatSummary[]> => {
 		.prepare(
 			'SELECT id, title, created_at, updated_at FROM chats ORDER BY updated_at DESC',
 		)
-		.all() as ChatSummary[];
+		.all() as unknown as ChatSummary[];
 });
 
 export const get_chat = query(
@@ -38,7 +38,7 @@ export const get_chat = query(
 		const db = get_db();
 		const chat = db
 			.prepare('SELECT * FROM chats WHERE id = ?')
-			.get(id) as ChatRow | undefined;
+			.get(id) as unknown as ChatRow | undefined;
 
 		if (!chat) return null;
 
