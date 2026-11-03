@@ -1,131 +1,91 @@
 # AudioMind
 
-A podcast transcription and semantic search tool with an AI-powered
-chat interface. Transcribe audio files, generate embeddings, and ask
-questions about your podcast content using RAG (Retrieval Augmented
-Generation).
+Transcribe audio files, search the transcripts, and ask questions
+about them in a chat UI with source citations (RAG).
 
 ## Features
 
-- **Audio Transcription** - Transcribe podcasts using Deepgram's
-  Nova-3 model with smart formatting and paragraph detection
-- **Semantic Search** - Vector similarity search powered by Voyage AI
-  embeddings and sqlite-vec
-- **AI Chat Interface** - Ask questions about your podcasts with
-  context-aware responses using Claude
-- **ID3 Tag Support** - Automatically extract podcast and episode
-  metadata from audio files
-- **Local Storage** - All data stored locally in SQLite
+- **Transcription** - Deepgram nova-3 (default, with speaker labels)
+  or OpenAI whisper-1. One file can have transcripts from both.
+- **Hybrid search** - OpenAI `text-embedding-3-small` vectors in
+  sqlite-vec, plus SQLite FTS5 keyword search, merged by rank
+- **Chat** - OpenAI answers from the matching transcript segments,
+  with timestamps
+- **Local storage** - One SQLite file via `node:sqlite`; schema in
+  `src/lib/server/schema.sql`
 
 ## Requirements
 
-- Node.js 22+
+- Node.js 24.15+ (CI uses 26)
 - pnpm
-- API keys for:
-  - [Deepgram](https://deepgram.com) - Audio transcription
-  - [Voyage AI](https://voyageai.com) - Text embeddings
-  - [Anthropic](https://anthropic.com) - AI chat (Claude)
+- API keys:
+  - [OpenAI](https://platform.openai.com) - chat, embeddings, and
+    optional transcription
+  - [Deepgram](https://deepgram.com) - transcription (default
+    provider)
 
 ## Setup
 
-1. Clone the repository and install dependencies:
-
 ```sh
 pnpm install
-```
-
-2. Create a `.env` file with your API keys:
-
-```sh
-DEEPGRAM_API_KEY=your_key
-VOYAGE_API_KEY=your_key
-ANTHROPIC_API_KEY=your_key
-```
-
-3. Initialize the database:
-
-```sh
+cp .env.example .env   # then add your keys
 pnpm cli init
 ```
 
-## CLI Usage
+The database defaults to `data/audiomind.db`. Set `DATABASE_PATH` to
+change it; the CLI and the app read the same variable.
 
-The CLI provides tools for processing audio files and managing your
-podcast library.
+## CLI
 
-### Process an Audio File
-
-Full pipeline - transcribe, embed, and ingest in one command:
-
-```sh
-pnpm cli process path/to/episode.mp3
-```
-
-Podcast name and episode title are auto-detected from ID3 tags.
-Override with flags:
+Transcribe, embed and save in one step. The title comes from the ID3
+tag unless you pass `--title`:
 
 ```sh
-pnpm cli process episode.mp3 --podcast "My Podcast" --episode "Episode 1"
+pnpm cli process episode.mp3
+pnpm cli process episode.mp3 --title "Episode 1" --url https://example.com/ep1
+pnpm cli process episode.mp3 --provider openai   # files up to 25 MB
+pnpm cli process episode.mp3 --provider openai --media 1  # add a second transcript to media 1
 ```
 
-### Search Your Library
+Transcribe once, save later (avoids paying to transcribe twice):
 
 ```sh
-pnpm cli search "topic you're looking for"
-pnpm cli search "machine learning" --limit 20
-pnpm cli search "interviews" --podcast "Tech Talk"
+pnpm cli transcribe episode.mp3 -o episode.json
+pnpm cli ingest episode.json --title "Episode 1"
 ```
 
-### Other Commands
+Other commands:
 
 ```sh
-pnpm cli list                    # List all podcasts and episodes
-pnpm cli inspect audio.mp3       # View audio file metadata
-pnpm cli transcribe audio.mp3    # Transcribe only (no embedding)
-pnpm cli update --podcast 1 --name "New Name"  # Update metadata
+pnpm cli search "topic you're looking for" --limit 20
+pnpm cli list                     # media and their transcripts
+pnpm cli inspect episode.mp3      # ID3 metadata
+pnpm cli rename 1 "New title"
+pnpm cli delete 1                 # removes transcripts, vectors, FTS rows
 ```
 
-## Web Interface
-
-Start the development server:
+## Web interface
 
 ```sh
 pnpm dev
 ```
 
-The web interface provides a chat UI where you can ask questions about
-your ingested podcasts. Responses include source citations with
-timestamps.
+## Tech stack
 
-## Tech Stack
-
-- **Frontend**: SvelteKit, Tailwind CSS, shadcn-svelte
-- **Backend**: SvelteKit API routes, better-sqlite3, sqlite-vec
-- **AI**: Anthropic Claude (chat), Voyage AI (embeddings), Deepgram
-  (transcription)
-- **CLI**: citty, music-metadata
-
-## Project Structure
-
-```
-src/
-├── cli/           # CLI tool for processing audio
-├── lib/
-│   ├── components/  # Svelte components
-│   └── server/      # Server-side utilities (database, AI clients)
-└── routes/
-    ├── api/         # API endpoints for chat
-    └── chat/        # Chat interface pages
-```
+- SvelteKit 3, vite-plus, Tailwind CSS, shadcn-svelte
+- `node:sqlite`, sqlite-vec, FTS5
+- AI SDK with OpenAI; Deepgram REST API
+- CLI: citty, music-metadata
 
 ## Development
 
 ```sh
-pnpm dev          # Start dev server
-pnpm check        # Type check
-pnpm lint         # Lint code
-pnpm test         # Run tests
-pnpm build        # Production build
+pnpm dev          # dev server
+pnpm check        # vp check + svelte-check
+pnpm lint         # vp check
+pnpm test:ci      # unit tests
+pnpm test:e2e     # Playwright
+pnpm build
 ```
 
 ## License
