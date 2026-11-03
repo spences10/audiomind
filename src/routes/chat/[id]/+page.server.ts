@@ -1,4 +1,4 @@
-import { get_db } from '$lib/server/database';
+import { get_db } from '#lib/server/database.js';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 

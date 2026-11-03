@@ -1,11 +1,11 @@
 <script lang="ts">
-	import favicon from '$lib/assets/favicon.svg';
-	import AppSidebar from '$lib/components/app-sidebar.svelte';
+	import favicon from '#lib/assets/favicon.svg';
+	import AppSidebar from '#lib/components/app-sidebar.svelte';
 	import {
 		SidebarInset,
 		SidebarProvider,
-	} from '$lib/components/ui/sidebar';
-	import { ChatHistory } from '$lib/state/chat-history.svelte';
+	} from '#lib/components/ui/sidebar/index.js';
+	import { ChatHistory } from '#lib/state/chat-history.svelte.js';
 	import { ModeWatcher } from 'mode-watcher';
 	import { onMount } from 'svelte';
 	import { Toaster } from 'svelte-sonner';

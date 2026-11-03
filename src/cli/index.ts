@@ -715,4 +715,4 @@ const main = defineCommand({
 	},
 });
 
-runMain(main);
+void runMain(main);

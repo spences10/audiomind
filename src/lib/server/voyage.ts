@@ -1,4 +1,4 @@
-import { VOYAGE_API_KEY } from '$env/static/private';
+import { VOYAGE_API_KEY } from '$app/env/private';
 
 export async function generate_embedding(
 	text: string,

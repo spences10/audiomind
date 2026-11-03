@@ -7,8 +7,8 @@ Generation).
 
 ## Features
 
-- **Audio Transcription** - Transcribe podcasts using Deepgram's Nova-3
-  model with smart formatting and paragraph detection
+- **Audio Transcription** - Transcribe podcasts using Deepgram's
+  Nova-3 model with smart formatting and paragraph detection
 - **Semantic Search** - Vector similarity search powered by Voyage AI
   embeddings and sqlite-vec
 - **AI Chat Interface** - Ask questions about your podcasts with
@@ -61,8 +61,8 @@ Full pipeline - transcribe, embed, and ingest in one command:
 pnpm cli process path/to/episode.mp3
 ```
 
-Podcast name and episode title are auto-detected from ID3 tags. Override
-with flags:
+Podcast name and episode title are auto-detected from ID3 tags.
+Override with flags:
 
 ```sh
 pnpm cli process episode.mp3 --podcast "My Podcast" --episode "Episode 1"

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { create_chat } from '$lib/chats.remote';
-	import Markdown from '$lib/components/chat/markdown.svelte';
-	import Sources from '$lib/components/chat/sources.svelte';
-	import { Button } from '$lib/components/ui/button';
-	import { SidebarTrigger } from '$lib/components/ui/sidebar';
-	import { Textarea } from '$lib/components/ui/textarea';
-	import { ChatHistory } from '$lib/state/chat-history.svelte';
+	import { create_chat } from '#lib/chats.remote.js';
+	import Markdown from '#lib/components/chat/markdown.svelte';
+	import Sources from '#lib/components/chat/sources.svelte';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { SidebarTrigger } from '#lib/components/ui/sidebar/index.js';
+	import { Textarea } from '#lib/components/ui/textarea/index.js';
+	import { ChatHistory } from '#lib/state/chat-history.svelte.js';
 	import { Chat } from '@ai-sdk/svelte';
 	import { ArrowUp, Sparkles } from '@lucide/svelte';
 	import { fly } from 'svelte/transition';

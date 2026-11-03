@@ -2,7 +2,7 @@ import {
 	delete_chat,
 	get_chats,
 	type ChatSummary,
-} from '$lib/chats.remote';
+} from '#lib/chats.remote.js';
 import { getContext, setContext } from 'svelte';
 
 export type { ChatSummary };

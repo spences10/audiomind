@@ -1,4 +1,4 @@
-import { ANTHROPIC_API_KEY } from '$env/static/private';
+import { ANTHROPIC_API_KEY } from '$app/env/private';
 
 export interface Message {
 	role: 'user' | 'assistant';

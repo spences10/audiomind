@@ -1,5 +1,5 @@
 import { command, query } from '$app/server';
-import { get_db } from '$lib/server/database';
+import { get_db } from '#lib/server/database.js';
 import * as v from 'valibot';
 
 export interface ChatSummary {

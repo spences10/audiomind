@@ -1,8 +1,5 @@
-import {
-	ANTHROPIC_API_KEY,
-	VOYAGE_API_KEY,
-} from '$env/static/private';
-import { get_db } from '$lib/server/database';
+import { ANTHROPIC_API_KEY, VOYAGE_API_KEY } from '$app/env/private';
+import { get_db } from '#lib/server/database.js';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { createUIMessageStreamResponse, streamText } from 'ai';
 import type { RequestHandler } from './$types';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import {
 		Sidebar,
 		SidebarContent,
@@ -13,9 +13,9 @@
 		SidebarMenu,
 		SidebarMenuButton,
 		SidebarMenuItem,
-	} from '$lib/components/ui/sidebar';
-	import { Skeleton } from '$lib/components/ui/skeleton';
-	import { ChatHistory } from '$lib/state/chat-history.svelte';
+	} from '#lib/components/ui/sidebar/index.js';
+	import { Skeleton } from '#lib/components/ui/skeleton/index.js';
+	import { ChatHistory } from '#lib/state/chat-history.svelte.js';
 	import { MessageSquare, Plus, Trash2 } from '@lucide/svelte';
 	import {
 		isToday,

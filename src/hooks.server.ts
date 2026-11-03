@@ -1,3 +1,3 @@
-import { init_database } from '$lib/server/database';
+import { init_database } from '#lib/server/database.js';
 
 init_database();
