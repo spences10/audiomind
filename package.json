@@ -31,7 +31,7 @@
 		"@ai-sdk/svelte": "^4.0.70",
 		"@deepgram/sdk": "^5.0.0",
 		"ai": "^6.0.70",
-		"better-sqlite3": "^12.6.2",
+		"better-sqlite3": "^12.11.1",
 		"citty": "^0.2.0",
 		"date-fns": "^4.1.0",
 		"mode-watcher": "^1.1.0",
