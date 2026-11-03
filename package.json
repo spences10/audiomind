@@ -28,6 +28,7 @@
 	},
 	"dependencies": {
 		"@ai-sdk/anthropic": "^3.0.36",
+		"@ai-sdk/openai": "^3.0.135",
 		"@ai-sdk/svelte": "^4.0.70",
 		"ai": "^6.0.70",
 		"better-sqlite3": "^12.11.1",

@@ -173,6 +173,9 @@ importers:
       '@ai-sdk/anthropic':
         specifier: ^3.0.36
         version: 3.0.137(zod@4.3.6)
+      '@ai-sdk/openai':
+        specifier: ^3.0.135
+        version: 3.0.135(zod@4.3.6)
       '@ai-sdk/svelte':
         specifier: ^4.0.70
         version: 4.0.320(svelte@5.57.3(@typescript-eslint/types@8.59.1))(zod@4.3.6)
@@ -302,6 +305,12 @@ packages:
 
   '@ai-sdk/gateway@3.0.226':
     resolution: {integrity: sha512-8lSJyyWqzpzEgUWZwY7miqIsl9NZv6qtlaioK7GSnQTbQkX5T8PEVz8IxCCRAwFYpria5O0YqKaukuIgZemfpA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/openai@3.0.135':
+    resolution: {integrity: sha512-PQBAYj5EfEPoaRslSSWdljY1AaPc+TZQn1pOyQndN0lcwWkkfG3LEDwCvDwlJJAjGvVyYmSO5wNeQTqOEf12zw==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -2859,6 +2868,12 @@ snapshots:
       '@ai-sdk/provider': 3.0.19
       '@ai-sdk/provider-utils': 4.0.63(zod@4.3.6)
       '@vercel/oidc': 3.2.0
+      zod: 4.3.6
+
+  '@ai-sdk/openai@3.0.135(zod@4.3.6)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.19
+      '@ai-sdk/provider-utils': 4.0.63(zod@4.3.6)
       zod: 4.3.6
 
   '@ai-sdk/provider-utils@4.0.63(zod@4.3.6)':
