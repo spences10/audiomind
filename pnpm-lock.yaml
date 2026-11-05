@@ -172,7 +172,7 @@ importers:
     dependencies:
       '@ai-sdk/openai':
         specifier: ^3.0.135
-        version: 3.0.135(zod@4.3.6)
+        version: 3.0.136(zod@4.3.6)
       '@ai-sdk/svelte':
         specifier: ^4.0.70
         version: 4.0.322(svelte@5.57.3(@typescript-eslint/types@8.59.1))(zod@4.3.6)
@@ -294,15 +294,9 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/openai@3.0.135':
-    resolution: {integrity: sha512-PQBAYj5EfEPoaRslSSWdljY1AaPc+TZQn1pOyQndN0lcwWkkfG3LEDwCvDwlJJAjGvVyYmSO5wNeQTqOEf12zw==}
+  '@ai-sdk/openai@3.0.136':
+    resolution: {integrity: sha512-oo81jtVqw/B7CDVa9h2iXQCFKLb9KoswjNeN8vkBoAyiRlb+mDrkVnTMI6FBKgGCzP9YYxnelnsjANMAOwC4bg==}
     engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.25.76 || ^4.1.8
-
-  '@ai-sdk/provider-utils@4.0.63':
-    resolution: {integrity: sha512-QSrfUn7pnb+2EZLLtpkcY6208ZZVi15QEJFyp/1jAYEH2UecthgAsyYWOJbpMSLtraviCByd6ii2meISIhkTZA==}
-    engines: {node: '>=18.17'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
@@ -2592,18 +2586,10 @@ snapshots:
       '@vercel/oidc': 3.2.0
       zod: 4.3.6
 
-  '@ai-sdk/openai@3.0.135(zod@4.3.6)':
+  '@ai-sdk/openai@3.0.136(zod@4.3.6)':
     dependencies:
       '@ai-sdk/provider': 3.0.19
-      '@ai-sdk/provider-utils': 4.0.63(zod@4.3.6)
-      zod: 4.3.6
-
-  '@ai-sdk/provider-utils@4.0.63(zod@4.3.6)':
-    dependencies:
-      '@ai-sdk/provider': 3.0.19
-      '@standard-schema/spec': 1.1.0
-      eventsource-parser: 3.0.8
-      undici: 6.29.1
+      '@ai-sdk/provider-utils': 4.0.64(zod@4.3.6)
       zod: 4.3.6
 
   '@ai-sdk/provider-utils@4.0.64(zod@4.3.6)':
