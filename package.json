@@ -29,7 +29,7 @@
 	"dependencies": {
 		"@ai-sdk/openai": "^3.0.135",
 		"@ai-sdk/svelte": "^4.0.70",
-		"ai": "^6.0.70",
+		"ai": "^7.0.0",
 		"citty": "^0.2.0",
 		"date-fns": "^4.1.0",
 		"mode-watcher": "^1.1.0",
