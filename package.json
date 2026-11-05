@@ -27,7 +27,7 @@
 		"test:e2e": "playwright test"
 	},
 	"dependencies": {
-		"@ai-sdk/openai": "^3.0.135",
+		"@ai-sdk/openai": "^4.0.0",
 		"@ai-sdk/svelte": "^4.0.70",
 		"ai": "^6.0.70",
 		"citty": "^0.2.0",
