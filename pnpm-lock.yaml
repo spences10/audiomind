@@ -175,7 +175,7 @@ importers:
         version: 4.0.108(zod@4.3.6)
       '@ai-sdk/svelte':
         specifier: ^5.0.162
-        version: 5.0.162(svelte@5.57.3(@typescript-eslint/types@8.59.1))(zod@4.3.6)
+        version: 5.0.163(svelte@5.57.3(@typescript-eslint/types@8.59.1))(zod@4.3.6)
       ai:
         specifier: ^7.0.162
         version: 7.0.162(zod@4.3.6)
@@ -294,6 +294,12 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
+  '@ai-sdk/gateway@4.0.136':
+    resolution: {integrity: sha512-P851NL80P85Ee6MhblRuuCzNlQdOYU5rKmdt/Wuo5dMtkzvIHhyVZY9wtfKG3wBJUUoxHxWKsI2aR6O75o8diA==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
   '@ai-sdk/openai@4.0.108':
     resolution: {integrity: sha512-XmCnCVnahoFs9VUWsSzn4LyONdDkFivBVs5t7YUWi74giDRwh8VRX4hnk/BtBKEhiBNGRQd80/QTWlf6GsVtng==}
     engines: {node: '>=22'}
@@ -306,12 +312,22 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
+  '@ai-sdk/provider-utils@5.0.75':
+    resolution: {integrity: sha512-k4yAsFliGZwoTpyTpm3ptxwIeaPvRh5vGh/UWoqDiLLXKoyz4zuBGS7p3ygf8to5Bh4fAOHynotLBsWLIYdu2A==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
   '@ai-sdk/provider@4.0.35':
     resolution: {integrity: sha512-yBz6fmLS8MSCIzy7NiHEUAq56ZLD4ZA1GR6bpXBxgbwUacP1La7LuwAr/xy9jSzthem4F8Xu2OrhvU/JrE9fYA==}
     engines: {node: '>=22'}
 
-  '@ai-sdk/svelte@5.0.162':
-    resolution: {integrity: sha512-wfGBWsJd4yitmKgaZ87j0Ko7ZgLfiYKJqO2J8+OnhGg81GJt3YlDpkMIE0HgcejFKhXKgLm0f82eKfLjYwe0vA==}
+  '@ai-sdk/provider@4.0.36':
+    resolution: {integrity: sha512-GqvWZSZdBelCGughlBdOoupT258rgM3YMbaLAS9WSZJ0vlt8c9vm3My+ZT31mYhiReMCMCF2qF2axnGbILpk1A==}
+    engines: {node: '>=22'}
+
+  '@ai-sdk/svelte@5.0.163':
+    resolution: {integrity: sha512-e4H1ka14TJqZFo8MArFohVBNqOE+uZr6Sq28dvYWsWZg7KD7ZE8DplweL8TNvVbygx2mCewYmH+HYCpsLei05g==}
     engines: {node: '>=22'}
     peerDependencies:
       svelte: ^5.31.0
@@ -1251,6 +1267,12 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
+  ai@7.0.163:
+    resolution: {integrity: sha512-nm8+qn36NQXO4Hjfj7SlbcNRhUyNXKtdoS9xhXr/z92lvdGFuPkzHmA2tFzhaUQy13IitNYrcw2QSNpEJC/iSA==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
@@ -2152,6 +2174,13 @@ snapshots:
       '@vercel/oidc': 3.2.0
       zod: 4.3.6
 
+  '@ai-sdk/gateway@4.0.136(zod@4.3.6)':
+    dependencies:
+      '@ai-sdk/provider': 4.0.36
+      '@ai-sdk/provider-utils': 5.0.75(zod@4.3.6)
+      '@vercel/oidc': 3.2.0
+      zod: 4.3.6
+
   '@ai-sdk/openai@4.0.108(zod@4.3.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.35
@@ -2167,14 +2196,27 @@ snapshots:
       undici: 7.30.1
       zod: 4.3.6
 
+  '@ai-sdk/provider-utils@5.0.75(zod@4.3.6)':
+    dependencies:
+      '@ai-sdk/provider': 4.0.36
+      '@standard-schema/spec': 1.1.0
+      '@workflow/serde': 4.1.0
+      eventsource-parser: 3.0.8
+      undici: 7.30.1
+      zod: 4.3.6
+
   '@ai-sdk/provider@4.0.35':
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/svelte@5.0.162(svelte@5.57.3(@typescript-eslint/types@8.59.1))(zod@4.3.6)':
+  '@ai-sdk/provider@4.0.36':
     dependencies:
-      '@ai-sdk/provider-utils': 5.0.74(zod@4.3.6)
-      ai: 7.0.162(zod@4.3.6)
+      json-schema: 0.4.0
+
+  '@ai-sdk/svelte@5.0.163(svelte@5.57.3(@typescript-eslint/types@8.59.1))(zod@4.3.6)':
+    dependencies:
+      '@ai-sdk/provider-utils': 5.0.75(zod@4.3.6)
+      ai: 7.0.163(zod@4.3.6)
       svelte: 5.57.3(@typescript-eslint/types@8.59.1)
     transitivePeerDependencies:
       - zod
@@ -2801,6 +2843,13 @@ snapshots:
       '@ai-sdk/gateway': 4.0.135(zod@4.3.6)
       '@ai-sdk/provider': 4.0.35
       '@ai-sdk/provider-utils': 5.0.74(zod@4.3.6)
+      zod: 4.3.6
+
+  ai@7.0.163(zod@4.3.6):
+    dependencies:
+      '@ai-sdk/gateway': 4.0.136(zod@4.3.6)
+      '@ai-sdk/provider': 4.0.36
+      '@ai-sdk/provider-utils': 5.0.75(zod@4.3.6)
       zod: 4.3.6
 
   ansi-regex@5.0.1: {}
