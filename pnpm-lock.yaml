@@ -205,7 +205,7 @@ importers:
         version: 1.2.3(svelte@5.57.3(@typescript-eslint/types@8.59.1))
       svelte-streamdown:
         specifier: ^5.0.0
-        version: 5.0.0(svelte@5.57.3(@typescript-eslint/types@8.59.1))
+        version: 5.0.1(svelte@5.57.3(@typescript-eslint/types@8.59.1))
       valibot:
         specifier: ^1.2.0
         version: 1.5.0(typescript@6.0.3)
@@ -1898,8 +1898,8 @@ packages:
     peerDependencies:
       svelte: ^5.0.0
 
-  svelte-streamdown@5.0.0:
-    resolution: {integrity: sha512-yYbHvkch7bpxH+M+afYKuYPaU9CDVG1vSwmZRJ/NOw8nItvI93GC63u06en00SiZXWVc4A2gqygpDm4PASanAw==}
+  svelte-streamdown@5.0.1:
+    resolution: {integrity: sha512-jNYoHkhIjwXxLJtSL8GsiveqR1IZKsaLlMkTOks0WCjbGVEH+xt0ielZK/0oZGr41uX2Tk7Um5A4zn6E5Jp4/w==}
     peerDependencies:
       svelte: ^5.0.0
 
@@ -3584,7 +3584,7 @@ snapshots:
     dependencies:
       svelte: 5.57.3(@typescript-eslint/types@8.59.1)
 
-  svelte-streamdown@5.0.0(svelte@5.57.3(@typescript-eslint/types@8.59.1)):
+  svelte-streamdown@5.0.1(svelte@5.57.3(@typescript-eslint/types@8.59.1)):
     dependencies:
       '@floating-ui/dom': 1.8.0
       '@tanstack/highlight': 1.2.11
