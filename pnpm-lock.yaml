@@ -172,7 +172,7 @@ importers:
     dependencies:
       '@ai-sdk/openai':
         specifier: ^4.0.108
-        version: 4.0.109(zod@4.3.6)
+        version: 4.0.110(zod@4.3.6)
       '@ai-sdk/svelte':
         specifier: ^5.0.162
         version: 5.0.164(svelte@5.57.3(@typescript-eslint/types@8.59.1))(zod@4.3.6)
@@ -294,8 +294,8 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/openai@4.0.109':
-    resolution: {integrity: sha512-N20L44ztSicqEWpB0LfV54Ee1iq6IjGfOFTcRfeTD/bRH0v/VDI1uHve7RFOhP2oi1eAluliBhgmurplaOBuVw==}
+  '@ai-sdk/openai@4.0.110':
+    resolution: {integrity: sha512-NIehl+lMI21kTFYM692tBMUiWVhwMZc/pVttnrRYkwc4Y8J9l4aN67F8Ld3exY8Uwa3o+lTb0zCu9KhLdAzDHg==}
     engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -2149,7 +2149,7 @@ snapshots:
       '@vercel/oidc': 3.2.0
       zod: 4.3.6
 
-  '@ai-sdk/openai@4.0.109(zod@4.3.6)':
+  '@ai-sdk/openai@4.0.110(zod@4.3.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.36
       '@ai-sdk/provider-utils': 5.0.75(zod@4.3.6)
