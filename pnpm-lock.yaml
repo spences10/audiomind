@@ -175,10 +175,10 @@ importers:
         version: 4.0.111(zod@4.3.6)
       '@ai-sdk/svelte':
         specifier: ^5.0.162
-        version: 5.0.165(svelte@5.57.3(@typescript-eslint/types@8.59.1))(zod@4.3.6)
+        version: 5.0.166(svelte@5.57.3(@typescript-eslint/types@8.59.1))(zod@4.3.6)
       ai:
         specifier: ^7.0.162
-        version: 7.0.165(zod@4.3.6)
+        version: 7.0.166(zod@4.3.6)
       citty:
         specifier: ^0.2.0
         version: 0.2.2
@@ -288,8 +288,8 @@ importers:
 
 packages:
 
-  '@ai-sdk/gateway@4.0.138':
-    resolution: {integrity: sha512-7a/LGqioUyU2CmjRjMwnX4WR5V4vP3+YdPZEAbh7CH9OXf1GcPSsiySsHxNbqiDlDnL+KdqPvWeipIR7u/VFHA==}
+  '@ai-sdk/gateway@4.0.139':
+    resolution: {integrity: sha512-2YEIPm4n59nm4PBhMGjFWH0g+ztPgfybqoeMIjfJYNiB8zLHftUrONgb8P3Ho3Yy5cdoLCjiDE/Hv2Crol0JBw==}
     engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -310,8 +310,8 @@ packages:
     resolution: {integrity: sha512-4uPgZ3qiX/JaQFr0dQoibUzHImZit9u05ro2BxGUnJwU4fV28BOAbKUa2OjQvqtM1tMac3bTKkaXdyzGovQXqg==}
     engines: {node: '>=22'}
 
-  '@ai-sdk/svelte@5.0.165':
-    resolution: {integrity: sha512-3hWHYGBviNHLbb4VEnXSI1K88SRYJBSn6qfMDP6YueHHYydZLZoadv+wW4opH3s3r5hE1ZcSarv5eogGsl7BFA==}
+  '@ai-sdk/svelte@5.0.166':
+    resolution: {integrity: sha512-y51pjJ9Wi08r4RUcA7lTWShmnOvbdk8KjkB34APNrPV1Nqy8TSOw73IjGDqFpmE9JDyh73UO7kbcR72LVMDpSQ==}
     engines: {node: '>=22'}
     peerDependencies:
       svelte: ^5.31.0
@@ -1242,8 +1242,8 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  ai@7.0.165:
-    resolution: {integrity: sha512-cEeORsLF+9+fNzvo4nQo9hxgQoEfupjc9Xmq6OM2NGUwQQQdkHxByBdFoqnNfBE0H+qwhGQaZejvbCFFD84tBA==}
+  ai@7.0.166:
+    resolution: {integrity: sha512-bijt5WsdpQXQLB0SHYEoSuvpZ8KdUxl3Iz843uvHFcGpEBSrxlgwXXadR7EBVOHoByEf2PwgOxutWU5dcdjs9Q==}
     engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -2142,7 +2142,7 @@ packages:
 
 snapshots:
 
-  '@ai-sdk/gateway@4.0.138(zod@4.3.6)':
+  '@ai-sdk/gateway@4.0.139(zod@4.3.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.37
       '@ai-sdk/provider-utils': 5.0.76(zod@4.3.6)
@@ -2168,10 +2168,10 @@ snapshots:
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/svelte@5.0.165(svelte@5.57.3(@typescript-eslint/types@8.59.1))(zod@4.3.6)':
+  '@ai-sdk/svelte@5.0.166(svelte@5.57.3(@typescript-eslint/types@8.59.1))(zod@4.3.6)':
     dependencies:
       '@ai-sdk/provider-utils': 5.0.76(zod@4.3.6)
-      ai: 7.0.165(zod@4.3.6)
+      ai: 7.0.166(zod@4.3.6)
       svelte: 5.57.3(@typescript-eslint/types@8.59.1)
     transitivePeerDependencies:
       - zod
@@ -2791,9 +2791,9 @@ snapshots:
 
   acorn@8.19.0: {}
 
-  ai@7.0.165(zod@4.3.6):
+  ai@7.0.166(zod@4.3.6):
     dependencies:
-      '@ai-sdk/gateway': 4.0.138(zod@4.3.6)
+      '@ai-sdk/gateway': 4.0.139(zod@4.3.6)
       '@ai-sdk/provider': 4.0.37
       '@ai-sdk/provider-utils': 5.0.76(zod@4.3.6)
       zod: 4.3.6
