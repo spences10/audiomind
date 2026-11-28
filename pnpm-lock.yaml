@@ -215,7 +215,7 @@ importers:
         version: 3.12.4
       '@lucide/svelte':
         specifier: ^1.0.0
-        version: 1.72.0(svelte@5.57.3(@typescript-eslint/types@8.59.1))
+        version: 1.81.0(svelte@5.57.3(@typescript-eslint/types@8.59.1))
       '@playwright/test':
         specifier: 1.65.0
         version: 1.65.0
@@ -287,12 +287,6 @@ importers:
         version: 3.1.0(svelte@5.57.3(@typescript-eslint/types@8.59.1))(vitest@5.1.0)
 
 packages:
-
-  '@ai-sdk/gateway@4.0.142':
-    resolution: {integrity: sha512-X5UpG2dMLT29OkHLOEknZ0/4/iEyPTuVEiNypiUc3ltuNz2k9ixssgBc/XcV4PylpBpz3RAdGQB4qDmVbUMX8A==}
-    engines: {node: '>=22'}
-    peerDependencies:
-      zod: ^3.25.76 || ^4.1.8
 
   '@ai-sdk/gateway@4.0.143':
     resolution: {integrity: sha512-N+n+7oHGtx4PtetjcBSe48ANVrcHTVV3rJtEfrPMUJMtak2Iw3aDhDFf7nxfpqKVEPMf7XvQ1dJ9yexdMEJiSw==}
@@ -371,8 +365,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@lucide/svelte@1.72.0':
-    resolution: {integrity: sha512-DRwtZ5p/m5ZRsNlfCzELJRDzd2z19mc76eMs8rwllx/JWfvykmLoTFs3RyzFN519ldQxHt8Jxum/LKukgzuTLQ==}
+  '@lucide/svelte@1.81.0':
+    resolution: {integrity: sha512-q8rljlyKNiZP6oYt4gQkUQQ1K3QsKHS/uCv7TjaRgxW8cY+S9i0+VW32DiH5RTDQgnlZBaZf2qklL1Dj/0J/qw==}
     peerDependencies:
       svelte: ^5
 
@@ -1247,12 +1241,6 @@ packages:
     resolution: {integrity: sha512-oJlA3XiRm7Cyk6qFD2Jn8ak9B7jSy0qy00ADO3+8dpT0LSjFihQYv4C02LFCSYJV3Q37xYwwRy5m+IpIiUzqWw==}
     engines: {node: '>=0.4.0'}
     hasBin: true
-
-  ai@7.0.169:
-    resolution: {integrity: sha512-p2GHNRXnIP7EE5/pV8pq2RrFDtXrSMSAZB6/CQHYXCaFXrKqspzDyXn89wSg5bv61V3KukjQQtguSOVkN5KI9w==}
-    engines: {node: '>=22'}
-    peerDependencies:
-      zod: ^3.25.76 || ^4.1.8
 
   ai@7.0.170:
     resolution: {integrity: sha512-hvgFzDNuheJA+FEN0nieIvKgjriGBd5b1Z4ntvJ5fAQel9l4Og0aUVBuPH5hbk5sx1pomtbC92cy/Vj/QIU4ig==}
@@ -2138,10 +2126,12 @@ packages:
   yuku-core@0.19.0:
     resolution: {integrity: sha512-kYK9e1XdfirNhkipzW0wmMcSWcVF/CWnuugodfVYRCUwvoBefweL9HzB96OiKEhsx78V5WbUxbJqlizMX869Qg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-parser@0.19.0:
     resolution: {integrity: sha512-XrBh9ZiQK5mJVRxZBAvD6LwRyAYrK3MFtH3+onyuxFL5hFD44EC3QOmIC1FjTj6H2MMwq46/NAI+NZxLZPZgxg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   zimmerframe@1.1.4:
     resolution: {integrity: sha512-B58NGBEoc8Y9MWWCQGl/gq9xBCe4IiKM0a2x7GZdQKOW5Exr8S1W24J6OgM1njK8xCRGvAJIL/MxXHf6SkmQKQ==}
@@ -2153,13 +2143,6 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
-
-  '@ai-sdk/gateway@4.0.142(zod@4.3.6)':
-    dependencies:
-      '@ai-sdk/provider': 4.0.37
-      '@ai-sdk/provider-utils': 5.0.79(zod@4.3.6)
-      '@vercel/oidc': 3.2.0
-      zod: 4.3.6
 
   '@ai-sdk/gateway@4.0.143(zod@4.3.6)':
     dependencies:
@@ -2245,7 +2228,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@lucide/svelte@1.72.0(svelte@5.57.3(@typescript-eslint/types@8.59.1))':
+  '@lucide/svelte@1.81.0(svelte@5.57.3(@typescript-eslint/types@8.59.1))':
     dependencies:
       svelte: 5.57.3(@typescript-eslint/types@8.59.1)
 
@@ -2810,13 +2793,6 @@ snapshots:
   '@yuku-toolchain/types@0.19.0': {}
 
   acorn@8.19.0: {}
-
-  ai@7.0.169(zod@4.3.6):
-    dependencies:
-      '@ai-sdk/gateway': 4.0.142(zod@4.3.6)
-      '@ai-sdk/provider': 4.0.37
-      '@ai-sdk/provider-utils': 5.0.79(zod@4.3.6)
-      zod: 4.3.6
 
   ai@7.0.170(zod@4.3.6):
     dependencies:
